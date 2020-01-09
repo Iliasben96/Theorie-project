@@ -4,7 +4,7 @@ from gate import Gate
 
 
 if __name__ == "__main__":
-    print(netlistreader(1, 1))
+    # print(netlistreader(1, 1))
 
     start_grid = Grid()
 
@@ -15,6 +15,6 @@ if __name__ == "__main__":
 
     # print(start_grid.get_gate_distance(1, 2))
     
-    # start_grid.print_grid()
+    start_grid.print_grid()
 
     start_grid.fill_priority_queue()

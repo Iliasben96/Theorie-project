@@ -1,6 +1,7 @@
 from gate import Gate
 import csv
 from netlist_reader import netlistreader
+from connection import Connection
 
 class Grid: 
 
@@ -9,6 +10,8 @@ class Grid:
 
     # Ordered list of all gates
     gate_list = []
+
+    connections = []
 
     # Create the start grid according to a chip_nr with a set amount of gates
     def get_start_grid(self, chip_nr, gate_amount):
@@ -135,28 +138,45 @@ class Grid:
 
         return
 
+    # TODO: Make sure this counts the correct distance between gates, taking into account illegal moves
     # Function that returns that distance of two inputted gate numbers
-    def get_gate_distance(self, gate_a_nr, gate_b_nr):
+    def get_gate_distance(self, gate_a, gate_b):
 
-        gate_list = Grid.gate_list
-        gate_a = gate_list[gate_a_nr - 1]
-        gate_b = gate_list[gate_b_nr - 1]
+        return 0
 
-        x_difference = gate_a.x - gate_b.x
-        y_difference = gate_a.y - gate_b.y
+    def fill_priority_queue(self):
 
-        if (x_difference < 0):
-            x_difference *= -1
+        connections = Grid.connections
 
-        if (y_difference < 0):
-            y_difference *= -1
+        # Read netlist
+        netlist = netlistreader(1, 1)
 
-        total_difference = x_difference + y_difference
+        # For each connection, get the gate
+        for connection in netlist:
 
-        return total_difference
+            gate_a_nr = int(connection[0])
+            gate_b_nr = int(connection[1])
 
+            gate_list = Grid.gate_list
+            gate_a = gate_list[gate_a_nr - 1]
+            gate_b = gate_list[gate_b_nr - 1]
 
-        
-            
+            # Get distance between both gates in netlist
+            gate_distance = self.get_gate_distance(gate_a, gate_b)
 
-  
+            # Create connection object
+            connection = Connection(gate_a, gate_b, gate_distance)
+
+            # Add connection to list of connections
+            connections.append(connection)
+
+            connections.sort(key=lambda connection: connection.distance)
+
+        # for connection in connections:
+        #     print(connection)
+
+        # connection = connections[1]
+        # gate_a = connection.gate_a
+        # gate_b = connection.gate_b
+
+        # print("Connection of gate_a: x:%d, y: %d, with gate_b: x: %d, y: %d" % (gate_a.x, gate_a.y, gate_b.x, gate_b.y))
