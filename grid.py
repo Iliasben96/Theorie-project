@@ -1,12 +1,20 @@
 from gate import Gate
 import csv
+from netlist_reader import netlistreader
 
 class Grid: 
 
+    # Global list that holds all 7 z levels of the x by y grids
+    mother_grid = []
+
+    # Ordered list of all gates
+    gate_list = []
+
+    # Create the start grid according to a chip_nr with a set amount of gates
     def get_start_grid(self, chip_nr, gate_amount):
   
-
         # List that holds all layers 
+        # TODO: rename this
         mother_grid = []
 
         # Set first row to True, used to skip first line
@@ -18,7 +26,7 @@ class Grid:
 
         # Fill array with empty gates
         empty_gate = Gate(0, 0, 0)
-        gate_list = [empty_gate] * gate_amount
+        Grid.gate_list = [empty_gate] * gate_amount
         
         # Create path to open chip
         path = 'gates&netlists/chip_' + str(chip_nr) + '/print_' + str(chip_nr) + '.csv'
@@ -50,7 +58,7 @@ class Grid:
 
                 # Create new gate object and add it to the list of gates
                 new_gate = Gate(gate_nr, gate_x, gate_y)
-                gate_list[gate_nr - 1] = new_gate
+                Grid.gate_list[gate_nr - 1] = new_gate
 
         # Calculate max_x and max_y to create grids
         max_x = max(all_x)
@@ -77,18 +85,78 @@ class Grid:
                 grid.append(row) 
             mother_grid.append(grid)
 
-        # DEBUG: print all gate numbers
-        for gate in gate_list:
-
+        # Put gates in grid at z level 0
+        for gate in Grid.gate_list:
             base_grid = mother_grid[0]
             correct_row = base_grid[gate.y]
             correct_row[gate.x] = 1
+ 
+        # Modify global mother grid
+        Grid.mother_grid = mother_grid
 
+        return mother_grid
+
+    # Function that prints out all layers of the grid to the console
+    def print_grid(self):
+        mother_grid = Grid.mother_grid
         counter = 0
-        # DEBUG: print the rows of the grid
         for grid in mother_grid:
             print("This is grid number: %d" % (counter))
             for row in grid:
                 print(row)
             counter += 1
-        return mother_grid
+    
+    # Function to get coordinates of a certain gate number
+    def get_gate_coordinate(self, gate_nr):
+
+        gate = Grid.gate_list[gate_nr - 1]
+        coordinates = {
+            "x" : gate.x,
+            "y" : gate.y
+        }
+
+        return coordinates
+
+    # Function that puts a 'wire' at an location in the grid based on x, y and z coordinates
+    def put_wire(self, x, y, z):
+        
+        mother_grid = Grid.mother_grid
+
+        correct_grid = mother_grid[z]
+
+        correct_row = correct_grid[y]
+
+        correct_position = correct_row[x]
+
+        if (correct_position == 0):
+            correct_row[x] = '-'
+        else:
+            print("Illegal move")
+
+        return
+
+    # Function that returns that distance of two inputted gate numbers
+    def get_gate_distance(self, gate_a_nr, gate_b_nr):
+
+        gate_list = Grid.gate_list
+        gate_a = gate_list[gate_a_nr - 1]
+        gate_b = gate_list[gate_b_nr - 1]
+
+        x_difference = gate_a.x - gate_b.x
+        y_difference = gate_a.y - gate_b.y
+
+        if (x_difference < 0):
+            x_difference *= -1
+
+        if (y_difference < 0):
+            y_difference *= -1
+
+        total_difference = x_difference + y_difference
+
+        return total_difference
+
+
+        
+            
+
+  
