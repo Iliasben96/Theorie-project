@@ -2,6 +2,7 @@ from gate import Gate
 import csv
 from netlist_reader import netlistreader
 from connection import Connection
+from wire import Wire
 
 class Grid: 
 
@@ -11,7 +12,11 @@ class Grid:
     # Ordered list of all gates
     gate_list = []
 
-    connections = []
+    # List of all wires
+    wire_list = []
+
+    grid_max_x = 0
+    grid_max_y = 0
 
     # Create the start grid according to a chip_nr with a set amount of gates
     def get_start_grid(self, chip_nr, gate_amount):
@@ -71,14 +76,20 @@ class Grid:
         padding_x = 1
         padding_y = 2
 
+        grid_max_x = max_x + padding_x
+        grid_max_y = max_y + padding_y
+
+        Grid.grid_max_x = grid_max_x
+        Grid.grid_max_y = grid_max_y
+
         # Create empty layers on top of base layer
         for z in range(0, 7):
             grid = []
 
             # Create fully empty grid with max values from gates
-            for column in range(0, max_y + padding_y):
+            for column in range(0, grid_max_y):
                 row = []
-                for item in range(0, max_x + padding_x):
+                for item in range(0, grid_max_x):
                     row.append(0)
                 
                 # Add extra padding after each row 
@@ -129,54 +140,10 @@ class Grid:
 
         correct_row = correct_grid[y]
 
-        correct_position = correct_row[x]
+        wire = Wire(x, y, z)
 
-        if (correct_position == 0):
-            correct_row[x] = '-'
-        else:
-            print("Illegal move")
+        Grid.wire_list.append(wire)
+
+        correct_row[x] = 2
 
         return
-
-    # TODO: Make sure this counts the correct distance between gates, taking into account illegal moves
-    # Function that returns that distance of two inputted gate numbers
-    def get_gate_distance(self, gate_a, gate_b):
-
-        return 0
-
-    def fill_priority_queue(self):
-
-        connections = Grid.connections
-
-        # Read netlist
-        netlist = netlistreader(1, 1)
-
-        # For each connection, get the gate
-        for connection in netlist:
-
-            gate_a_nr = int(connection[0])
-            gate_b_nr = int(connection[1])
-
-            gate_list = Grid.gate_list
-            gate_a = gate_list[gate_a_nr - 1]
-            gate_b = gate_list[gate_b_nr - 1]
-
-            # Get distance between both gates in netlist
-            gate_distance = self.get_gate_distance(gate_a, gate_b)
-
-            # Create connection object
-            connection = Connection(gate_a, gate_b, gate_distance)
-
-            # Add connection to list of connections
-            connections.append(connection)
-
-            connections.sort(key=lambda connection: connection.distance)
-
-        # for connection in connections:
-        #     print(connection)
-
-        # connection = connections[1]
-        # gate_a = connection.gate_a
-        # gate_b = connection.gate_b
-
-        # print("Connection of gate_a: x:%d, y: %d, with gate_b: x: %d, y: %d" % (gate_a.x, gate_a.y, gate_b.x, gate_b.y))
