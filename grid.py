@@ -132,18 +132,27 @@ class Grid:
         return coordinates
 
     # Function that puts a 'wire' at an location in the grid based on x, y and z coordinates
-    def put_wire(self, x, y, z):
+    def put_wire(self, wire):
         
         mother_grid = Grid.mother_grid
 
-        correct_grid = mother_grid[z]
+        correct_grid = mother_grid[wire.z]
 
-        correct_row = correct_grid[y]
-
-        wire = Wire(x, y, z)
+        correct_row = correct_grid[wire.y]
 
         Grid.wire_list.append(wire)
 
-        correct_row[x] = 2
+        correct_row[wire.x] = 2
 
         return
+    
+    def remove_start_end(self, start, end):
+        grid = Grid.mother_grid[0]
+
+        start_correct_row = grid[start[1]]
+        start_correct_row[start[0]] = 0
+
+        end_correct_row = grid[end[1]]
+        end_correct_row[end[0]] = 0
+
+        Grid.mother_grid[0] = grid

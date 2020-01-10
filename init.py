@@ -18,16 +18,6 @@ if __name__ == "__main__":
 
     # Create new plot
     chip_plot = Plot(start_grid)
-
-
-    start_grid.put_wire(1, 5, 0)
-    start_grid.put_wire(2, 5, 0)
-    start_grid.put_wire(3, 5, 0)
-    start_grid.put_wire(3, 6, 0)
-    start_grid.put_wire(4, 6, 0)
-    start_grid.put_wire(5, 6, 0)
     
-    
-
     # Show new plot
     chip_plot.plot()
