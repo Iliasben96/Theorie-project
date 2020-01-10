@@ -34,18 +34,19 @@ class Plot:
         ax = Axes3D(fig)
         ax.set_title('Chipset')
         
-        # Add coordinates
-        x_1 = [1,2,3]
-        y_1 = [3,3,3]
-        z_1 = [0,0,0]
+        wires = grid.wire_list
 
-        x_2 = [2,3,4,4,4,4,5]
-        y_2 = [1,1,1,2,3,4,4]
-        z_2 = [0,0,0,0,0,0,0]
-        
-        # Add Lines
-        ax.plot(xs=x_1, ys=y_1, zs=z_1, c='b')
-        ax.plot(xs=x_2, ys=y_2, zs=z_2, c='y')
+        wire_x = []
+        wire_y = []
+        wire_z = []
+
+        for wire in wires:
+            wire_x.append(wire.x)
+            wire_y.append(wire.y)
+            wire_z.append(wire.z)
+
+        # Add coordinates
+        ax.plot(xs=wire_x, ys=wire_y, zs=wire_z, c='r')
 
         # Add gates
         for i,gate in enumerate(gate_numbers):
