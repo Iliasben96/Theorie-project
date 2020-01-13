@@ -1,6 +1,8 @@
 from gate import Gate
 import csv
 from netlist_reader import netlistreader
+from connection import Connection
+from wire import Wire
 
 class Grid: 
 
@@ -9,6 +11,12 @@ class Grid:
 
     # Ordered list of all gates
     gate_list = []
+
+    # List of all wires
+    wire_list = []
+
+    grid_max_x = 0
+    grid_max_y = 0
 
     # Create the start grid according to a chip_nr with a set amount of gates
     def get_start_grid(self, chip_nr, gate_amount):
@@ -68,14 +76,20 @@ class Grid:
         padding_x = 1
         padding_y = 2
 
+        grid_max_x = max_x + padding_x
+        grid_max_y = max_y + padding_y
+
+        Grid.grid_max_x = grid_max_x
+        Grid.grid_max_y = grid_max_y
+
         # Create empty layers on top of base layer
         for z in range(0, 7):
             grid = []
 
             # Create fully empty grid with max values from gates
-            for column in range(0, max_y + padding_y):
+            for column in range(0, grid_max_y):
                 row = []
-                for item in range(0, max_x + padding_x):
+                for item in range(0, grid_max_x):
                     row.append(0)
                 
                 # Add extra padding after each row 
@@ -118,45 +132,27 @@ class Grid:
         return coordinates
 
     # Function that puts a 'wire' at an location in the grid based on x, y and z coordinates
-    def put_wire(self, x, y, z):
+    def put_wire(self, wire):
         
         mother_grid = Grid.mother_grid
 
-        correct_grid = mother_grid[z]
+        correct_grid = mother_grid[wire.z]
 
-        correct_row = correct_grid[y]
+        correct_row = correct_grid[wire.y]
 
-        correct_position = correct_row[x]
+        Grid.wire_list.append(wire)
 
-        if (correct_position == 0):
-            correct_row[x] = '-'
-        else:
-            print("Illegal move")
+        correct_row[wire.x] = 2
 
         return
+    
+    def remove_start_end(self, start, end):
+        grid = Grid.mother_grid[0]
 
-    # Function that returns that distance of two inputted gate numbers
-    def get_gate_distance(self, gate_a_nr, gate_b_nr):
+        start_correct_row = grid[start[1]]
+        start_correct_row[start[0]] = 0
 
-        gate_list = Grid.gate_list
-        gate_a = gate_list[gate_a_nr - 1]
-        gate_b = gate_list[gate_b_nr - 1]
+        end_correct_row = grid[end[1]]
+        end_correct_row[end[0]] = 0
 
-        x_difference = gate_a.x - gate_b.x
-        y_difference = gate_a.y - gate_b.y
-
-        if (x_difference < 0):
-            x_difference *= -1
-
-        if (y_difference < 0):
-            y_difference *= -1
-
-        total_difference = x_difference + y_difference
-
-        return total_difference
-
-
-        
-            
-
-  
+        Grid.mother_grid[0] = grid

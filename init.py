@@ -1,20 +1,23 @@
 from netlist_reader import netlistreader
 from grid import Grid
 from gate import Gate
+from plot import Plot
 
 
 if __name__ == "__main__":
-    print(netlistreader(1, 1))
 
+    # Make new grid instance
     start_grid = Grid()
 
+    # Generate start grid
+    # TODO: Make this dynamic according to size of print
     grid = start_grid.get_start_grid(1, 25)
 
-    # start_grid.put_wire(2, 1, 0)
-    # start_grid.put_wire(1, 1, 0)
+    # DEBUG: print grid
+    start_grid.print_grid()
 
-    # print(start_grid.get_gate_distance(1, 2))
+    # Create new plot
+    chip_plot = Plot(start_grid)
     
-    # start_grid.print_grid()
-
-    start_grid.fill_priority_queue()
+    # Show new plot
+    chip_plot.plot()
