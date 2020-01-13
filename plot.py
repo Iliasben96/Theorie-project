@@ -25,7 +25,7 @@ class Plot:
         for gate in gate_list:
             gate_numbers.append(gate.nr)
             gates_x.append(gate.x)
-            gates_y.append(gate.y)
+            gates_y.append(grid.grid_max_y)
             gates_z.append(0)
             
 
@@ -42,7 +42,7 @@ class Plot:
 
         for wire in wires:
             wire_x.append(wire.x)
-            wire_y.append(wire.y)
+            wire_y.append(grid.grid_max_y)
             wire_z.append(wire.z)
 
         # Add coordinates

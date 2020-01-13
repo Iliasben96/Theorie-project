@@ -16,8 +16,8 @@ if __name__ == "__main__":
     # DEBUG: print grid
     start_grid.print_grid()
 
-    # Create new plot
-    chip_plot = Plot(start_grid)
+    # # Create new plot
+    # chip_plot = Plot(start_grid)
     
-    # Show new plot
-    chip_plot.plot()
+    # # Show new plot
+    # chip_plot.plot()
