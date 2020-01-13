@@ -84,25 +84,26 @@ def astar(maze, start, end):
 
         # Loop through children
         for child in children:
-            child_already_explored = False
+            # child_already_explored = False
             # Child is on the closed list
             for closed_child in closed_list:
                 if child == closed_child:
-                    child_already_explored = True
-
-            if not child_already_explored:
+                    # child_already_explored = True
+                    continue
+                
+            # if not child_already_explored:
                 # Create the f, g, and h values
-                child.g = current_node.g + 1
-                child.h = ((child.position[0] - end_node.position[0]) ** 2) + ((child.position[1] - end_node.position[1]) ** 2)
-                child.f = child.g + child.h
+            child.g = current_node.g + 1
+            child.h = ((child.position[0] - end_node.position[0]) ** 2) + ((child.position[1] - end_node.position[1]) ** 2)
+            child.f = child.g + child.h
 
                 # Child is already in the open list
-                for open_node in open_list:
-                    if child == open_node and child.g > open_node.g:
-                        continue
+            for open_node in open_list:
+                if child == open_node and child.g > open_node.g:
+                    continue
 
-                # Add the child to the open list
-                open_list.append(child)
+            # Add the child to the open list
+            open_list.append(child)
 
 
 
@@ -122,8 +123,8 @@ def main():
     grid = Grid()
     grid.get_start_grid(1, 25)
 
-    start = (2, 1)
-    end = (16, 5)
+    start = (1, 1)
+    end = (8, 8)
 
     grid.remove_start_end(start, end)
     grid.print_grid()

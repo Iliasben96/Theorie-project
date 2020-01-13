@@ -74,10 +74,12 @@ class Grid:
 
         # Variables required to padding around the edges of the grid
         padding_x = 1
-        padding_y = 2
+        padding_y = 1
 
         grid_max_x = max_x + padding_x
         grid_max_y = max_y + padding_y
+
+        self.grid_max_y = grid_max_y
 
         Grid.grid_max_x = grid_max_x
         Grid.grid_max_y = grid_max_y
@@ -87,7 +89,7 @@ class Grid:
             grid = []
 
             # Create fully empty grid with max values from gates
-            for column in range(0, grid_max_y):
+            for column in range(0, grid_max_y + 1):
                 row = []
                 for item in range(0, grid_max_x):
                     row.append(0)
@@ -96,14 +98,15 @@ class Grid:
                 row.append(0)
 
                 # Add each row to the grid
-                grid.append(row) 
+                grid.append(row)
+
             mother_grid.append(grid)
 
         # Put gates in grid at z level 0
         for gate in Grid.gate_list:
             base_grid = mother_grid[0]
-            correct_row = base_grid[gate.y]
-            correct_row[gate.x] = 1
+            correct_row = base_grid[(grid_max_y - gate.y)]
+            correct_row[gate.x] = gate.nr
  
         # Modify global mother grid
         Grid.mother_grid = mother_grid
@@ -145,14 +148,14 @@ class Grid:
         correct_row[wire.x] = 2
 
         return
-    
+
     def remove_start_end(self, start, end):
         grid = Grid.mother_grid[0]
 
-        start_correct_row = grid[start[1]]
+        start_correct_row = grid[self.grid_max_y - start[1]]
         start_correct_row[start[0]] = 0
 
-        end_correct_row = grid[end[1]]
+        end_correct_row = grid[self.grid_max_y - end[1]]
         end_correct_row[end[0]] = 0
 
         Grid.mother_grid[0] = grid
