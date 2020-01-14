@@ -17,14 +17,16 @@ class Grid:
     grid_max_x = 0
     grid_max_y = 0
 
+    temporary_gate_list = []
+
     # function to calculate how many gates a print list has
-    def get_gate_amount(self, chip_nr):
+    def read_chip_csv(self, chip_nr):
         counter = 0
 
         first_row = True
+
         # Create path to open chip
         path = 'gates&netlists/chip_' + str(chip_nr) + '/print_' + str(chip_nr) + '.csv'
-
 
         # open CSV file
         with open(path, newline='') as gatesfile:
@@ -36,14 +38,18 @@ class Grid:
                     first_row = False
                     continue
                 counter += 1
-        return counter 
-                
+
+                # Remove comma
+                for i in range(0, 2):
+                    row[i] = row[i].strip(',')
+
+                Grid.temporary_gate_list.append(row)
+                print(row)
+
+        return counter          
 
     # Create the start grid according to a chip_nr with a set amount of gates
     def get_start_grid(self, chip_nr):
-
-        # Set first row to True, used to skip first line
-        first_row = True
 
         # Lists to later figure out the maximum coordinates of a gate
         all_x = []
@@ -51,40 +57,20 @@ class Grid:
 
         # Fill array with empty gates
         empty_gate = Gate(0, 0, 0)
-        Grid.gate_list = [empty_gate] * self.get_gate_amount(chip_nr)
-        print(self.get_gate_amount(chip_nr))
-        
-        # Create path to open chip
-        path = 'gates&netlists/chip_' + str(chip_nr) + '/print_' + str(chip_nr) + '.csv'
+        Grid.gate_list = [empty_gate] * self.read_chip_csv(chip_nr)
 
-        # open CSV file
-        with open(path, newline='') as gatesfile:
-            filereader = csv.reader(gatesfile, delimiter=' ', quotechar = '|')
+        for gate_data in Grid.temporary_gate_list:
+            gate_nr = int(gate_data[0])
+            gate_x = int(gate_data[1])
+            gate_y = int(gate_data[2])
 
-            # Loop over csv rows
-            for row in filereader:
+            # Add the coordinates of the gate to a list
+            all_x.append(gate_x)
+            all_y.append(gate_y)
 
-                # Skip first row
-                if first_row:
-                    first_row = False
-                    continue
-
-                # Remove comma
-                for i in range(0, 2):
-                    row[i] = row[i].strip(',')
-
-                # Assign variables to gate objects from csv file
-                gate_nr = int(row[0])
-                gate_x = int(row[1])
-                gate_y = int(row[2])
-
-                # Add the coordinates of the gate to a list
-                all_x.append(gate_x)
-                all_y.append(gate_y)
-
-                # Create new gate object and add it to the list of gates
-                new_gate = Gate(gate_nr, gate_x, gate_y)
-                Grid.gate_list[gate_nr - 1] = new_gate
+            # Create new gate object and add it to the list of gates
+            new_gate = Gate(gate_nr, gate_x, gate_y)
+            Grid.gate_list[gate_nr - 1] = new_gate
 
         # Calculate max_x and max_y to create grids
         max_x = max(all_x)
@@ -184,10 +170,8 @@ class Grid:
 
         return coordinates
 
-    # Function that puts a 'wire' at an location in the grid based on x, y and z coordinates
+    # Function that adds a set of wires, called connection, to a list of connections
     def put_connection(self, connection):
-
-        
         for wire in connection:
 
             base_grid = Grid.mother_grid[wire[2]]
