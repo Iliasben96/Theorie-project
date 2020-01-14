@@ -17,8 +17,30 @@ class Grid:
     grid_max_x = 0
     grid_max_y = 0
 
+    # function to calculate how many gates a print list has
+    def get_gate_amount(self, chip_nr):
+        counter = 0
+
+        first_row = True
+        # Create path to open chip
+        path = 'gates&netlists/chip_' + str(chip_nr) + '/print_' + str(chip_nr) + '.csv'
+
+
+        # open CSV file
+        with open(path, newline='') as gatesfile:
+            filereader = csv.reader(gatesfile, delimiter=' ', quotechar = '|')
+            # Loop over csv rows
+            for row in filereader:
+
+                if first_row:
+                    first_row = False
+                    continue
+                counter += 1
+        return counter 
+                
+
     # Create the start grid according to a chip_nr with a set amount of gates
-    def get_start_grid(self, chip_nr, gate_amount):
+    def get_start_grid(self, chip_nr):
 
         # Set first row to True, used to skip first line
         first_row = True
@@ -29,7 +51,8 @@ class Grid:
 
         # Fill array with empty gates
         empty_gate = Gate(0, 0, 0)
-        Grid.gate_list = [empty_gate] * gate_amount
+        Grid.gate_list = [empty_gate] * self.get_gate_amount(chip_nr)
+        print(self.get_gate_amount(chip_nr))
         
         # Create path to open chip
         path = 'gates&netlists/chip_' + str(chip_nr) + '/print_' + str(chip_nr) + '.csv'
