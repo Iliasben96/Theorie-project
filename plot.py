@@ -10,7 +10,6 @@ class Plot:
     def __init__(self, grid):
         self.grid = grid
 
-
     def plot(self):
 
         gate_numbers = []

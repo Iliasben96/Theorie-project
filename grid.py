@@ -111,14 +111,51 @@ class Grid:
         return mother_grid
 
     # Function that prints out all layers of the grid to the console
-    def print_grid(self):
+    def print_grid(self, z):
         mother_grid = Grid.mother_grid
-        base_grid = mother_grid[0]
+        base_grid = mother_grid[z]
         for y, x in base_grid.items():
             print("Y = %d"% (y))
             print(x)
 
-    
+    # Function that returns all neighbors of a position
+    def get_neighbors(self, position):
+
+        x = position[0]
+        y = position[1]
+        z = position[2]
+
+        neighbors = []
+        mother_grid = Grid.mother_grid
+        grid = mother_grid[z]
+
+        x_left = x - 1
+        x_right = x + 1
+        y_up = y + 1
+        y_down = y - 1
+        z_level_up = z + 1
+        z_level_down = z - 1
+
+        if (y_up in grid and x in grid[y_up]):
+            up_neighbor = (x, y_up, z)
+            neighbors.append(up_neighbor)
+        if (y_down in grid and x in grid[y_down]):
+            down_neighbor = (x, y_down, z)
+            neighbors.append(down_neighbor)
+        if (x_left in grid[y]):
+            left_neighbor = (x_left, y, z)
+            neighbors.append(left_neighbor)
+        if (x_right in grid[y]):
+            right_neighbor = (x_right, y, z)
+            neighbors.append(right_neighbor)
+        if (z_level_up in mother_grid and x in mother_grid[z_level_up][y]):
+            level_up_neighbor = (x, y, z_level_up)
+            neighbors.append(level_up_neighbor)
+        if (z_level_down in mother_grid and x in mother_grid[z_level_down][y]):
+            level_down_neighbor = (x, y, z_level_down)
+            neighbors.append(level_down_neighbor)
+        return(neighbors)
+
     # Function to get coordinates of a certain gate number
     def get_gate_coordinate(self, gate_nr):
 
@@ -135,23 +172,31 @@ class Grid:
         
         mother_grid = Grid.mother_grid
 
-        correct_grid = mother_grid[wire.z]
+        print(wire[2])
+        base_grid = mother_grid[wire[2]]
 
-        correct_row = correct_grid[wire.y]
+        correct_row = base_grid[wire[1]]
 
-        Grid.wire_list.append(wire)
-
-        correct_row[wire.x] = 2
+        correct_row.remove(wire[0])
 
         return
 
-    def remove_start_end(self, start, end):
-        grid = Grid.mother_grid[0]
+    def add_start_end_gates(self, start, end):
+        start_x = start[0]
+        start_y = start[1]
+        base_grid_index = 0
 
-        start_correct_row = grid[start[1]]
-        start_correct_row[start[0]] = 0
+        end_x = end[0]
+        end_y = end[1]
 
-        end_correct_row = grid[end[1]]
-        end_correct_row[end[0]] = 0
+        grid = Grid.mother_grid[base_grid_index]
 
-        Grid.mother_grid[0] = grid
+        start_correct_row = grid[start_y]
+        start_correct_row.append(start_x)
+
+        end_correct_row = grid[end_y]
+        end_correct_row.append(end_x)
+
+        Grid.mother_grid[base_grid_index] = grid
+    
+    
