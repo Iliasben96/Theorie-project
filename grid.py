@@ -2,7 +2,6 @@ from gate import Gate
 import csv
 from netlist_reader import netlistreader
 from connection import Connection
-from wire import Wire
 
 class Grid: 
 
@@ -13,17 +12,13 @@ class Grid:
     gate_list = []
 
     # List of all wires
-    wire_list = []
+    connections_list = []
 
     grid_max_x = 0
     grid_max_y = 0
 
     # Create the start grid according to a chip_nr with a set amount of gates
     def get_start_grid(self, chip_nr, gate_amount):
-  
-        # List that holds all layers 
-        # TODO: rename this
-        mother_grid = {}
 
         # Set first row to True, used to skip first line
         first_row = True
@@ -97,23 +92,19 @@ class Grid:
                 # Add each row to the grid
                 grid[y] = row
 
-            mother_grid[z] = grid
+            Grid.mother_grid[z] = grid
 
         # Put gates in grid at z level 0
         for gate in Grid.gate_list:
-            base_grid = mother_grid[0]
+            base_grid = Grid.mother_grid[0]
             correct_row = base_grid[gate.y]
             correct_row.remove(gate.x)
- 
-        # Modify global mother grid
-        Grid.mother_grid = mother_grid
 
-        return mother_grid
+        return Grid.mother_grid
 
     # Function that prints out all layers of the grid to the console
     def print_grid(self, z):
-        mother_grid = Grid.mother_grid
-        base_grid = mother_grid[z]
+        base_grid = Grid.mother_grid[z]
         for y, x in base_grid.items():
             print("Y = %d"% (y))
             print(x)
@@ -129,6 +120,7 @@ class Grid:
         mother_grid = Grid.mother_grid
         grid = mother_grid[z]
 
+        # All possible moving positions
         x_left = x - 1
         x_right = x + 1
         y_up = y + 1
@@ -136,6 +128,7 @@ class Grid:
         z_level_up = z + 1
         z_level_down = z - 1
 
+        # Check if neigbors are legal, add legal ones to list of neighbors
         if (y_up in grid and x in grid[y_up]):
             up_neighbor = (x, y_up, z)
             neighbors.append(up_neighbor)
@@ -154,6 +147,7 @@ class Grid:
         if (z_level_down in mother_grid and x in mother_grid[z_level_down][y]):
             level_down_neighbor = (x, y, z_level_down)
             neighbors.append(level_down_neighbor)
+
         return(neighbors)
 
     # Function to get coordinates of a certain gate number
@@ -168,19 +162,20 @@ class Grid:
         return coordinates
 
     # Function that puts a 'wire' at an location in the grid based on x, y and z coordinates
-    def put_wire(self, wire):
+    def put_connection(self, connection):
+
         
-        mother_grid = Grid.mother_grid
+        for wire in connection:
 
-        print(wire[2])
-        base_grid = mother_grid[wire[2]]
+            base_grid = Grid.mother_grid[wire[2]]
 
-        correct_row = base_grid[wire[1]]
+            correct_row = base_grid[wire[1]]
 
-        correct_row.remove(wire[0])
+            correct_row.remove(wire[0])
 
-        return
+        Grid.connections_list.append(connection)
 
+    # Add start and end gates as walkable terrain when they are being used
     def add_start_end_gates(self, start, end):
         start_x = start[0]
         start_y = start[1]
@@ -198,5 +193,3 @@ class Grid:
         end_correct_row.append(end_x)
 
         Grid.mother_grid[base_grid_index] = grid
-    
-    

@@ -1,5 +1,6 @@
 import heapq
 
+# Retrieved from https://www.redblobgames.com/pathfinding/a-star/implementation.html
 class PriorityQueue:
     def __init__(self):
         self.elements = []

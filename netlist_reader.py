@@ -20,8 +20,9 @@ def netlistreader(chip_number, netlist_number):
                 first_row = False
                 continue
             
-            # Remove comma and addd to list
+            # Remove comma and add to list
             for i in range(0, 2):
                 row[i] = row[i].strip(',')
+                row[i] = int(row[i])
             netlist.append(row)
     return netlist

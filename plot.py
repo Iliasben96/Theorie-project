@@ -12,6 +12,7 @@ class Plot:
 
     def plot(self):
 
+        # Creation of lists with coordinates for the gates
         gate_numbers = []
         gates_x = []
         gates_y = []
@@ -24,28 +25,31 @@ class Plot:
         for gate in gate_list:
             gate_numbers.append(gate.nr)
             gates_x.append(gate.x)
-            gates_y.append(grid.grid_max_y)
+            gates_y.append(gate.y)
             gates_z.append(0)
-            
 
         # Create figure
         fig = plt.figure()
         ax = Axes3D(fig)
         ax.set_title('Chipset')
         
-        wires = grid.wire_list
 
-        wire_x = []
-        wire_y = []
-        wire_z = []
+        # Creation of lists with coordinates for the wires
+        connections = grid.connections_list
 
-        for wire in wires:
-            wire_x.append(wire.x)
-            wire_y.append(grid.grid_max_y)
-            wire_z.append(wire.z)
+        for connection in connections:
 
-        # Add coordinates
-        ax.plot(xs=wire_x, ys=wire_y, zs=wire_z, c='r')
+            wire_x = []
+            wire_y = []
+            wire_z = []
+
+            for wire in connection:
+                wire_x.append(wire[0])
+                wire_y.append(wire[1])
+                wire_z.append(wire[2])
+            
+            # Add wires
+            ax.plot(xs=wire_x, ys=wire_y, zs=wire_z, c='r')
 
         # Add gates
         for i,gate in enumerate(gate_numbers):

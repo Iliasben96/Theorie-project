@@ -2,7 +2,8 @@ import math
 from grid import Grid
 from priority_queue import PriorityQueue
 
-class Node:
+# TODO: Figure out if this needs to be a class
+class Algorithms:
 
     def pythagoras_heuristic(self, current, goal):
         a = current[0] - goal[0] 
@@ -26,6 +27,9 @@ class Node:
         
     # Shortest path algorithm Dijkstra 
     def astar(self, grid, start, goal):
+
+        # Make sure start and end are walkable
+        grid.add_start_end_gates(start, goal)
 
         # Initialise the priority queue
         frontier = PriorityQueue()
@@ -51,16 +55,14 @@ class Node:
 
             # Stop if you reach goal
             if current == goal:
-                print("Found goal")
-
+                # print("Found goal")
+                path = []
                 position = current
                 while position != came_from[start]:
-                    print(position)
-                    grid.put_wire(position)
-                    position = came_from[position]
-                    
-
-                break
+                    path.append(position)
+                    position = came_from[position] 
+                grid.put_connection(path)      
+                return path
 
             # Get neighbors from grid
             neighbors = grid.get_neighbors(current)
