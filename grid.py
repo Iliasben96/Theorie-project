@@ -115,6 +115,9 @@ class Grid:
             correct_row = base_grid[gate.y]
             correct_row.remove(gate.x)
 
+            # Remove neighbours
+            
+
         return Grid.mother_grid
 
     # Function that prints out all layers of the grid to the console
@@ -190,8 +193,6 @@ class Grid:
             Grid.wire_count += 1
 
         Grid.connections_list.append(connection)
-
-        
 
     # Add start and end gates as walkable terrain when they are being used
     def add_start_end_gates(self, start, end):

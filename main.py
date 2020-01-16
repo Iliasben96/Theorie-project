@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     sl = SolvingLoop(grid, netlist)
 
-    sl.start(3)
+    sl.start(2)
 
     print("Wires used: %d" % (grid.wire_count))
 
