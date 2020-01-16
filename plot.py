@@ -24,9 +24,9 @@ class Plot:
 
         for gate in gate_list:
             gate_numbers.append(gate.nr)
-            gates_x.append(gate.x)
-            gates_y.append(gate.y)
-            gates_z.append(0)
+            gates_x.append(gate.coordinates[0])
+            gates_y.append(gate.coordinates[1])
+            gates_z.append(gate.coordinates[2])
 
         # Create figure
         fig = plt.figure()

@@ -60,6 +60,7 @@ class Algorithms:
                 position = current
                 while position != came_from[start]:
                     path.append(position)
+                    grid.all_wires.append(position)
                     position = came_from[position] 
                 grid.put_connection(path)      
                 return path
@@ -87,3 +88,4 @@ class Algorithms:
 
                     # Store where the child came from
                     came_from[next_node] = current
+        grid.relock_gate_neighbors(start, goal)

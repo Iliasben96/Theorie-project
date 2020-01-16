@@ -2,12 +2,10 @@
 
 class Gate:
 
-    def __init__(self, nr, x, y):
+    def __init__(self, nr, coordinates):
         self.nr = nr
-        self.x = x
-        self.y = y
-        self.z = 0
+        self.coordinates = coordinates
         self.priority = 0
 
     def __str__(self):
-        return f'nr: {self.nr} x: {self.x} y:{self.y} z:{self.z}'
+        return f'nr: {self.nr} coordinates: {self.coordinates}'

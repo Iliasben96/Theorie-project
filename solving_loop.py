@@ -7,6 +7,7 @@ class SolvingLoop:
     def __init__(self, grid, netlist):
         self.grid = grid
         self.netlist = netlist
+        self.not_solved_counter = 0
         self.get_gate_links()
 
     # Make sure this list contains gate objects instead of tuples
@@ -28,8 +29,8 @@ class SolvingLoop:
 
             gate_start = link[0]
             gate_goal = link[1]
-            gate_start_position = self.generate_gate_tuple(gate_start)
-            gate_goal_position = self.generate_gate_tuple(gate_goal)
+            gate_start_position = gate_start.coordinates
+            gate_goal_position = gate_goal.coordinates
 
             tuple_link.append(gate_start_position)
             tuple_link.append(gate_goal_position)
@@ -39,10 +40,6 @@ class SolvingLoop:
 
     def calculate_priority(self):
         return
-
-    def generate_gate_tuple(self, gate):
-
-        return (gate.x, gate.y, gate.z)
 
     def get_gate_links(self):
         for connection in self.netlist:
@@ -64,10 +61,6 @@ class SolvingLoop:
 
             SolvingLoop.gate_links.append(link)
 
-    def get_priority(self):
-
-        return
-
     # Rebuild all functions to return priority instead of priority queue
     def get_priority_center_grid(self):
 
@@ -81,7 +74,7 @@ class SolvingLoop:
         # TODO: sort the connection based on the lowest manhattan heuristic
         for link in SolvingLoop.gate_links:
             start_gate = link[0]
-            start_coordinate = self.generate_gate_tuple(link[0])
+            start_coordinate = start_gate.coordinates
             goal = centre
             priority = algorithms.manhattan_heuristic(start_coordinate, goal)
             start_gate.priority += priority
@@ -138,8 +131,8 @@ class SolvingLoop:
 
             start_gate = link[0]
             goal_gate = link[1]
-            start_coordinate = self.generate_gate_tuple(start_gate)
-            goal_coordinate = self.generate_gate_tuple(goal_gate)
+            start_coordinate = start_gate.coordinates
+            goal_coordinate = goal_gate.coordinates
 
             priority = algorithms.manhattan_heuristic(start_coordinate, goal_coordinate)
 
@@ -157,22 +150,35 @@ class SolvingLoop:
             # print(path)
             if path == None:
                 not_solved_counter += 1
-        print("%d wrong connections" % (not_solved_counter))
+        self.not_solved_counter = not_solved_counter
 
     def start(self, priority_option):
 
+        # Try to solve using lowest length first
         if priority_option == 1:
             self.get_connection_length_priority()
-            # self.solver(pq)
+            pq = self.generate_pq()
+            self.solver(pq)
 
+        # Try to solve using closest to center first
         elif priority_option == 2:
-            # self.get_connection_length_priority()
-            connections_per_gate = self.get_connections_per_gate()
             self.get_priority_center_grid()
+            pq = self.generate_pq()
+            self.solver(pq)
+
+        # Try to solve using number of connections per gate first
+        elif priority_option == 3:
+            connections_per_gate = self.get_connections_per_gate()
             self.get_amount_of_connections_priority(connections_per_gate)
             pq = self.generate_pq()
             self.solver(pq)
-        elif priority_option == 3:
+
+        elif priority_option == 4:
+            self.get_connection_length_priority()
             self.get_priority_center_grid()
+            pq = self.generate_pq()
+            self.solver(pq)
+
+        elif priority_option == 5:
             pq = self.generate_pq()
             self.solver(pq)
