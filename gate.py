@@ -7,6 +7,7 @@ class Gate:
         self.x = x
         self.y = y
         self.z = 0
+        self.priority = 0
 
     def __str__(self):
         return f'nr: {self.nr} x: {self.x} y:{self.y} z:{self.z}'

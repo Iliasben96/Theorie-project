@@ -25,7 +25,7 @@ class Algorithms:
         h = distance_x + distance_y + (distance_z * 2)
         return h
         
-    # Shortest path algorithm Dijkstra 
+    # Shortest path algorithm Astar 
     def astar(self, grid, start, goal):
 
         # Make sure start and end are walkable

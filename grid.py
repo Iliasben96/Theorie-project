@@ -5,6 +5,11 @@ from connection import Connection
 
 class Grid: 
 
+    def __init__(self, chip_nr):
+        self.chip_nr = chip_nr
+        self.read_chip_csv(chip_nr)
+        self.get_start_grid(chip_nr)
+
     # Global list that holds all 7 z levels of the x by y grids
     mother_grid = {}
 
@@ -18,6 +23,8 @@ class Grid:
     grid_max_y = 0
 
     temporary_gate_list = []
+
+    wire_count = 0
 
     # function to calculate how many gates a print list has
     def read_chip_csv(self, chip_nr):
@@ -44,7 +51,6 @@ class Grid:
                     row[i] = row[i].strip(',')
 
                 Grid.temporary_gate_list.append(row)
-                print(row)
 
         return counter          
 
@@ -180,7 +186,12 @@ class Grid:
 
             correct_row.remove(wire[0])
 
+            # Count total length of all wires
+            Grid.wire_count += 1
+
         Grid.connections_list.append(connection)
+
+        
 
     # Add start and end gates as walkable terrain when they are being used
     def add_start_end_gates(self, start, end):
