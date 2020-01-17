@@ -70,4 +70,12 @@ class Plot:
         plt.xticks(np.arange(0, grid.grid_max_x, 1.0))
         plt.yticks(np.arange(0, grid.grid_max_y, 1.0))
 
+        # Set colors for lines
+        colormap = plt.cm.gist_ncar #nipy_spectral, Set1,Paired   
+        colors = [colormap(i) for i in np.linspace(0, 1,len(ax.lines))]
+        for i,j in enumerate(ax.lines):
+            j.set_color(colors[i])
+
+        ax.legend(loc=2)
+
         plt.show()
