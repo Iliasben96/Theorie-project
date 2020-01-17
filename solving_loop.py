@@ -1,6 +1,7 @@
 from priority_queue import PriorityQueue
 from algorithms import Algorithms
 from grid import Grid
+import random
 
 class SolvingLoop:  
 
@@ -152,6 +153,21 @@ class SolvingLoop:
                 not_solved_counter += 1
         self.not_solved_counter = not_solved_counter
 
+    def random_selector(self):
+        priority = 1
+
+        for link in self.netlist:
+            option_list = random.choices(self.netlist, k=1)
+            option = option_list[0]
+            self.netlist.remove(option)
+            gate_nr = option[0]
+            gate = self.grid.gate_list[gate_nr - 1]
+            gate.priority += priority
+            priority += 1
+            
+
+
+
     def start(self, priority_option):
 
         # Try to solve using lowest length first
@@ -182,3 +198,9 @@ class SolvingLoop:
         elif priority_option == 5:
             pq = self.generate_pq()
             self.solver(pq)
+
+        elif priority_option == 6:
+            self.random_selector()
+            pq = self.generate_pq()
+            self.solver(pq)
+        
