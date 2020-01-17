@@ -30,6 +30,7 @@ class Algorithms:
 
         # Make sure start and end are walkable
         grid.add_start_end_gates(start, goal)
+        grid.add_back_gate_neighbors(start, goal)
 
         # Initialise the priority queue
         frontier = PriorityQueue()

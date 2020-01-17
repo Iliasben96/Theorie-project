@@ -115,15 +115,17 @@ class Grid:
 
         all_gate_neighbors = []
 
+        connected_gates = []
+
+        # Loop over all connections in gate list
         for gate in Grid.gate_list:
 
-            if gate.nr in netlist:
+            # Check if the gate is in the netlist
+            for connection in netlist:
+                if gate.nr in connection and gate.nr not in connected_gates:
 
-                # Make list of neighbors to remove
-                neighbors = self.get_neighbors(gate.coordinates)
-
-                for neighbor in neighbors:
-                    all_gate_neighbors.append(neighbor)
+                    # If it is, add the nummber to a new list
+                    connected_gates.append(gate.nr)
 
             # Remove coordinates of gates from grid
             gate_coordinates = gate.coordinates
@@ -131,18 +133,30 @@ class Grid:
             correct_row = base_grid[gate_coordinates[1]]
             correct_row.remove(gate_coordinates[0])
 
-        # Remove duplicates from list of neighbors
-        unique_gate_neighbors = list(dict.fromkeys(all_gate_neighbors))
+        # For each gate that has a connection according to the netlist
+        for gate_nr in connected_gates:
+
+            gate = Grid.gate_list[gate_nr - 1]
+            # Get neighbors of this gate
+            neighbors = self.get_neighbors(gate.coordinates)
+
+            for neighbor in neighbors:
+
+                if neighbor not in all_gate_neighbors:
+
+                    all_gate_neighbors.append(neighbor)
 
         # Remove all neighbors from grid
-        for unique_gate_neighbor in unique_gate_neighbors:
+        for gate_neighbor in all_gate_neighbors:
 
-            base_grid = Grid.mother_grid[unique_gate_neighbor[2]]
-            correct_row = base_grid[unique_gate_neighbor[1]]
+            base_grid = Grid.mother_grid[gate_neighbor[2]]
+            correct_row = base_grid[gate_neighbor[1]]
             
             for x in correct_row:
-                if unique_gate_neighbor[0] == x:
-                    correct_row.remove(unique_gate_neighbor[0])
+                if gate_neighbor[0] == x:
+                    correct_row.remove(gate_neighbor[0])
+
+        print("Grid without any neighbors")
         print(Grid.mother_grid[0])
 
         return Grid.mother_grid
@@ -269,31 +283,58 @@ class Grid:
 
         Grid.mother_grid[base_grid_index] = grid
 
-        # Add back neighbors as walkable terrain
+    # Add back neighbors as walkable terrain
+    def add_back_gate_neighbors(self, start, goal):
         start_neighbors = self.get_gate_neighbors(start)
 
+        found_wire = False
+
+        # Loop over neighbors of start point
         for start_neighbor in start_neighbors:
-            print(start_neighbor)
+
+            # Check if the neighbor has a wire in its place
             for wire in Grid.all_wires:
-                # print(wire)
                 
                 if start_neighbor == wire:
                     print("Dit werkt")
-                    continue
-
-                grid = Grid.mother_grid[start_neighbor[2]]
-                start_neighbor_correct_row = grid[start_neighbor[1]]
-                if start_neighbor[0] not in start_neighbor_correct_row:
+                    found_wire == True
+                    
+            neighbor_already_placed = False
+            # Only add back the neighbor as walkable terrain if it is not a wire
+            if found_wire == False:
+                print(start_neighbor)
+                base_grid = Grid.mother_grid[start_neighbor[2]]
+                start_neighbor_correct_row = base_grid[start_neighbor[1]]
+                for x in start_neighbor_correct_row:
+                    print("Want to place: %d, found %d" % (start_neighbor[0], x))
+                    
+                    if x == start_neighbor[0]:
+                        print("Neighbor already placed")
+                        neighbor_already_placed = True
+                if neighbor_already_placed == False:
+                    print("Neighbor not yet placed")
                     start_neighbor_correct_row.append(start_neighbor[0])
+                    Grid.mother_grid[start_neighbor[2]][start_neighbor[1]] = start_neighbor_correct_row
+
+        found_wire = False
 
         goal_neighbors = self.get_gate_neighbors(goal)
 
         for goal_neighbor in goal_neighbors:
 
+            for wire in Grid.all_wires:
+
+                if goal_neighbor == wire:
+                    print("Dit werkt")
+                    found_wire == True
+
             grid = Grid.mother_grid[goal_neighbor[2]]
             goal_neighbor_correct_row = grid[goal_neighbor[1]]
             if goal_neighbor[0] not in goal_neighbor_correct_row:
                 goal_neighbor_correct_row.append(goal_neighbor[0])
+
+        print("Grid with neighbors of (1, 1, 0) and (8, 8, 0) put back")
+        print(Grid.mother_grid[0])
 
     def relock_gate_neighbors(self, start, goal):
 
