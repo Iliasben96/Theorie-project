@@ -273,7 +273,6 @@ class Grid:
         start_neighbors = self.get_gate_neighbors(start)
 
         for start_neighbor in start_neighbors:
-            print(start_neighbor)
             for wire in Grid.all_wires:
                 # print(wire)
                 
