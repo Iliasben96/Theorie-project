@@ -11,23 +11,20 @@ if __name__ == "__main__":
 
     netlist = netlistreader(1, 1)
 
-    # # Make new grid instance
+    # Make new grid instance
     grid = Grid(1, netlist, True)
 
-    # sl = SolvingLoop(grid, netlist)
+    sl = SolvingLoop(grid, netlist)
 
-    # sl.start(3)
+    sl.get_priority_center_grid()
+    sl.solver()
 
-    # print("Wires not solved %d " % (sl.not_solved_counter))
-    # print("Wires solved %d" % (30 - sl.not_solved_counter))
-    # print("Wires used: %d" % (grid.wire_count))
-    # wires_per_connection = grid.wire_count / (30 - sl.not_solved_counter)
-    # print("Wires per succesfull connection")
-    # print(wires_per_connection)
+    print("Wires not solved %d " % (sl.not_solved_counter))
+    print("Wires solved %d" % (30 - sl.not_solved_counter))
+    print("Wires used: %d" % (grid.wire_count))
+    wires_per_connection = grid.wire_count / (30 - sl.not_solved_counter)
+    print("Wires per succesfull connection")
+    print(wires_per_connection)
 
-    # chip_plot = Plot(grid)
-    # chip_plot.plot()
-
-    # Debug: Test the test_solver
-    test_solver = TestSolver(grid, netlist)
-    test_solver.make_connections()
+    chip_plot = Plot(grid)
+    chip_plot.plot()
