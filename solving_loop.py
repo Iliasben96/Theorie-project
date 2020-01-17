@@ -166,8 +166,6 @@ class SolvingLoop:
             priority += 1
             
 
-
-
     def start(self, priority_option):
 
         # Try to solve using lowest length first

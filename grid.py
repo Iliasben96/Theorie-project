@@ -287,11 +287,8 @@ class Grid:
 
         # Loop over neighbors of start point
         for start_neighbor in start_neighbors:
-<<<<<<< HEAD
 
             # Check if the neighbor has a wire in its place
-=======
->>>>>>> 7018536344faf045072bfcdc657212e71e849577
             for wire in Grid.all_wires:
                 
                 if start_neighbor == wire:
