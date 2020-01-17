@@ -1,6 +1,7 @@
 from gate import Gate
 import csv
 from connection import Connection
+import random
 
 class Grid: 
 
@@ -156,9 +157,6 @@ class Grid:
                 if gate_neighbor[0] == x:
                     correct_row.remove(gate_neighbor[0])
 
-        print("Grid without any neighbors")
-        print(Grid.mother_grid[0])
-
         return Grid.mother_grid
 
     # Function that prints out all layers of the grid to the console
@@ -215,8 +213,6 @@ class Grid:
         z = position[2]
 
         neighbors = []
-        mother_grid = Grid.mother_grid
-        grid = mother_grid[z]
 
         # All possible moving positions
         x_left = x - 1
@@ -296,55 +292,54 @@ class Grid:
             for wire in Grid.all_wires:
                 
                 if start_neighbor == wire:
-                    print("Dit werkt")
                     found_wire == True
                     
             neighbor_already_placed = False
             # Only add back the neighbor as walkable terrain if it is not a wire
             if found_wire == False:
-                print(start_neighbor)
                 base_grid = Grid.mother_grid[start_neighbor[2]]
                 start_neighbor_correct_row = base_grid[start_neighbor[1]]
                 for x in start_neighbor_correct_row:
-                    print("Want to place: %d, found %d" % (start_neighbor[0], x))
                     
                     if x == start_neighbor[0]:
-                        print("Neighbor already placed")
                         neighbor_already_placed = True
                 if neighbor_already_placed == False:
-                    print("Neighbor not yet placed")
                     start_neighbor_correct_row.append(start_neighbor[0])
                     Grid.mother_grid[start_neighbor[2]][start_neighbor[1]] = start_neighbor_correct_row
 
-        found_wire = False
-
         goal_neighbors = self.get_gate_neighbors(goal)
+
+        found_wire = False
 
         for goal_neighbor in goal_neighbors:
 
             for wire in Grid.all_wires:
 
                 if goal_neighbor == wire:
-                    print("Dit werkt")
                     found_wire == True
-
-            grid = Grid.mother_grid[goal_neighbor[2]]
-            goal_neighbor_correct_row = grid[goal_neighbor[1]]
-            if goal_neighbor[0] not in goal_neighbor_correct_row:
-                goal_neighbor_correct_row.append(goal_neighbor[0])
-
-        print("Grid with neighbors of (1, 1, 0) and (8, 8, 0) put back")
-        print(Grid.mother_grid[0])
+            
+            neighbor_already_placed = False
+                    
+            if found_wire == False:
+                base_grid = Grid.mother_grid[goal_neighbor[2]]
+                goal_neighbor_correct_row = base_grid[goal_neighbor[1]]
+                for x in goal_neighbor_correct_row:                    
+                    if x == goal_neighbor[0]:
+                        neighbor_already_placed = True
+                if neighbor_already_placed == False:
+                    # print("Neighbor not yet placed")
+                    goal_neighbor_correct_row.append(goal_neighbor[0])
+                    Grid.mother_grid[goal_neighbor[2]][goal_neighbor[1]] = goal_neighbor_correct_row
 
     def relock_gate_neighbors(self, start, goal):
 
-        grid = Grid.mother_grid[start[2]]
+        grid = {} 
 
         # Lock neighbors to not be walkable anymore
         start_neighbors = self.get_gate_neighbors(start)
 
         for start_neighbor in start_neighbors:
-
+            grid = Grid.mother_grid[start_neighbor[2]]
             start_neighbor_correct_row = grid[start_neighbor[1]]
 
             if start_neighbor[0] in start_neighbor_correct_row:
@@ -353,7 +348,6 @@ class Grid:
         goal_neighbors = self.get_gate_neighbors(goal)
 
         for goal_neighbor in goal_neighbors:
-
             grid = Grid.mother_grid[goal_neighbor[2]]
             goal_neighbor_correct_row = grid[goal_neighbor[1]]
             if goal_neighbor[0] in goal_neighbor_correct_row:

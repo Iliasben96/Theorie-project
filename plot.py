@@ -76,6 +76,6 @@ class Plot:
         for i,j in enumerate(ax.lines):
             j.set_color(colors[i])
 
-        ax.legend(loc=2)
+        # ax.legend(loc=2)
 
         plt.show()
