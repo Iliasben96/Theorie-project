@@ -39,9 +39,6 @@ class SolvingLoop:
             pq.put(tuple_link, gate_start.priority)
         return pq
 
-    def calculate_priority(self):
-        return
-
     def get_gate_links(self):
         for connection in self.netlist:
 
@@ -120,7 +117,6 @@ class SolvingLoop:
         # Sorting dictionary from: https://stackoverflow.com/questions/613183/how-do-i-sort-a-dictionary-by-value
         # Sort dictionary based on number of connections, highest first
         sorted_gate_n_connections = {k: v for k, v in sorted(gate_n_connections.items(), key=lambda item: item[1], reverse=True)}
-
         return sorted_gate_n_connections   
 
     def get_connection_length_priority(self):
@@ -202,3 +198,5 @@ class SolvingLoop:
             pq = self.generate_pq()
             self.solver(pq)
         
+    def get_grid(self):
+        return self.grid

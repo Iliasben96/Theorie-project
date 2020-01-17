@@ -5,8 +5,9 @@ import random
 
 class Grid: 
 
-    def __init__(self, chip_nr, netlist):
+    def __init__(self, chip_nr, netlist, remove_neighbors):
         self.chip_nr = chip_nr
+        self.remove_neighbors = remove_neighbors
         self.read_chip_csv(chip_nr)
         self.get_start_grid(chip_nr, netlist)
 
@@ -134,28 +135,29 @@ class Grid:
             correct_row = base_grid[gate_coordinates[1]]
             correct_row.remove(gate_coordinates[0])
 
-        # For each gate that has a connection according to the netlist
-        for gate_nr in connected_gates:
+        if self.remove_neighbors == True:
+            # For each gate that has a connection according to the netlist
+            for gate_nr in connected_gates:
 
-            gate = Grid.gate_list[gate_nr - 1]
-            # Get neighbors of this gate
-            neighbors = self.get_neighbors(gate.coordinates)
+                gate = Grid.gate_list[gate_nr - 1]
+                # Get neighbors of this gate
+                neighbors = self.get_neighbors(gate.coordinates)
 
-            for neighbor in neighbors:
+                for neighbor in neighbors:
 
-                if neighbor not in all_gate_neighbors:
+                    if neighbor not in all_gate_neighbors:
 
-                    all_gate_neighbors.append(neighbor)
+                        all_gate_neighbors.append(neighbor)
 
-        # Remove all neighbors from grid
-        for gate_neighbor in all_gate_neighbors:
+            # Remove all neighbors from grid
+            for gate_neighbor in all_gate_neighbors:
 
-            base_grid = Grid.mother_grid[gate_neighbor[2]]
-            correct_row = base_grid[gate_neighbor[1]]
-            
-            for x in correct_row:
-                if gate_neighbor[0] == x:
-                    correct_row.remove(gate_neighbor[0])
+                base_grid = Grid.mother_grid[gate_neighbor[2]]
+                correct_row = base_grid[gate_neighbor[1]]
+                
+                for x in correct_row:
+                    if gate_neighbor[0] == x:
+                        correct_row.remove(gate_neighbor[0])
 
         return Grid.mother_grid
 
