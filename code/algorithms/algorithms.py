@@ -1,6 +1,6 @@
 import math
-from grid import Grid
-from priority_queue import PriorityQueue
+from code.classes.grid import Grid
+from code.classes.priority_queue import PriorityQueue
 
 # TODO: Figure out if this needs to be a class
 class Algorithms:

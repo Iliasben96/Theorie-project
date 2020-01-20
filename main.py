@@ -1,11 +1,10 @@
-from netlist_reader import netlistreader
-from grid import Grid
-from gate import Gate
-from plot import Plot
-from algorithms import Algorithms
-from priority_queue import PriorityQueue
-from solving_loop import SolvingLoop
-from test_solver import TestSolver
+from code.classes.netlist_reader import netlistreader
+from code.classes.grid import Grid
+from code.classes.gate import Gate
+from code.visualisation.plot import Plot
+from code.algorithms.algorithms import Algorithms
+from code.classes.priority_queue import PriorityQueue
+from code.classes.solving_loop import SolvingLoop
 
 if __name__ == "__main__":
 

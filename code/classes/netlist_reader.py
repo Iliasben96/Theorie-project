@@ -7,7 +7,7 @@ def netlistreader(chip_number, netlist_number):
     first_row = True
 
     # Construct filepath
-    file_to_open = "gates&netlists/chip_" + str(chip_number) +  "/netlist_" + str(netlist_number) + ".csv"
+    file_to_open = "data/gates&netlists/chip_" + str(chip_number) +  "/netlist_" + str(netlist_number) + ".csv"
 
     # Open this file
     with open(file_to_open, newline='') as gatesfile:

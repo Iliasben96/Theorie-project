@@ -1,6 +1,6 @@
-from gate import Gate
+from code.classes.gate import Gate
+from code.classes.connection import Connection
 import csv
-from connection import Connection
 import random
 
 class Grid: 
@@ -41,7 +41,7 @@ class Grid:
         first_row = True
 
         # Create path to open chip
-        path = 'gates&netlists/chip_' + str(chip_nr) + '/print_' + str(chip_nr) + '.csv'
+        path = 'data/gates&netlists/chip_' + str(chip_nr) + '/print_' + str(chip_nr) + '.csv'
 
         # open CSV file
         with open(path, newline='') as gatesfile:
