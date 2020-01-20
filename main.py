@@ -11,12 +11,13 @@ if __name__ == "__main__":
 
     netlist = netlistreader(1, 1)
 
-    # Make new grid instance
-    grid = Grid(1, netlist, True)
+    # # Make new grid instance
+    grid = Grid(1, netlist, False)
 
     sl = SolvingLoop(grid, netlist)
+    # connections_per_gate = sl.get_connections_per_gate()
 
-    sl.get_priority_center_grid()
+    sl.get_connection_length_priority()
     sl.solver()
 
     print("Wires not solved %d " % (sl.not_solved_counter))
@@ -28,3 +29,7 @@ if __name__ == "__main__":
 
     chip_plot = Plot(grid)
     chip_plot.plot()
+
+    # # Debug: Test the test_solver
+    # test_solver = TestSolver(grid, netlist)
+    # test_solver.make_connections()

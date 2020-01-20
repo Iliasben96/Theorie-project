@@ -58,15 +58,14 @@ class SolvingLoop:
         for gate_nr,n_connections in connections_per_gate.items():
 
             priority = (6 - n_connections) / 2
-            for link in SolvingLoop.gate_links:
-                gate_a = link[0]
-                gate_b = link[1]
+            for connection_nr in self.gate_connections:
+                connection = self.gate_connections[connection_nr]
+                gate_a = connection.gate_a
+                gate_b = connection.gate_b
 
-                if gate_nr == gate_a.nr:
-                    gate_a.priority += priority
-                elif gate_nr == gate_b.nr:
-                    gate_b.priority += priority              
-
+                if gate_nr == gate_a.nr or gate_nr == gate_b.nr:
+                    connection.priority += priority
+           
     def get_connections_per_gate(self):
 
         gate_n_connections = {}
@@ -99,16 +98,15 @@ class SolvingLoop:
 
         # Calculate priority for each connection
 
-        for link in SolvingLoop.gate_links:
+         # TODO: sort the connection based on the lowest manhattan heuristic
+        for connection_nr in self.gate_connections:
+            connection = self.gate_connections[connection_nr]
+            gate_a = connection.gate_a
+            gate_b = connection.gate_b
 
-            start_gate = link[0]
-            goal_gate = link[1]
-            start_coordinate = start_gate.coordinates
-            goal_coordinate = goal_gate.coordinates
+            priority = algorithms.manhattan_heuristic(gate_a.coordinates, gate_b.coordinates)
 
-            priority = algorithms.manhattan_heuristic(start_coordinate, goal_coordinate)
-
-            start_gate.priority += priority
+            connection.priority += priority
         
 
     def solver(self):
