@@ -1,7 +1,8 @@
-from priority_queue import PriorityQueue
 from algorithms import Algorithms
 from grid import Grid
 import random
+from connection import Connection
+import operator
 
 class SolvingLoop:  
 
@@ -9,11 +10,12 @@ class SolvingLoop:
         self.grid = grid
         self.netlist = netlist
         self.not_solved_counter = 0
-        self.get_gate_links()
+        self.gate_connections = {}
+        self.make_connections()
 
-    # Make sure this list contains gate objects instead of tuples
-    gate_links = []
+        # Make sure this list contains gate objects instead of tuples
 
+<<<<<<< HEAD
     # Create tuple from gate object
     def debug(self):
         print (self.gate_links)
@@ -40,9 +42,12 @@ class SolvingLoop:
         return pq
 
     def get_gate_links(self):
-        for connection in self.netlist:
+=======
 
-            link = []
+    def make_connections(self):
+        id_counter = 0
+>>>>>>> test
+        for connection in self.netlist:
 
             # Get gate numbers from netlist
             gate_a_nr = connection[0]
@@ -52,12 +57,18 @@ class SolvingLoop:
             start_gate = self.grid.gate_list[gate_a_nr - 1]
             goal_gate = self.grid.gate_list[gate_b_nr - 1]
 
+<<<<<<< HEAD
             # Make a tuple from the gate object
 
             link.append(start_gate)
             link.append(goal_gate)
 
             self.gate_links.append(link)
+=======
+            new_connection = Connection(start_gate, goal_gate, id_counter)
+            self.gate_connections[id_counter] = new_connection
+            id_counter += 1
+>>>>>>> test
 
     # Rebuild all functions to return priority instead of priority queue
     def get_priority_center_grid(self):
@@ -70,19 +81,32 @@ class SolvingLoop:
         centre = (centre_x, centre_y, 0)
 
         # TODO: sort the connection based on the lowest manhattan heuristic
+<<<<<<< HEAD
         for link in self.gate_links:
             start_gate = link[0]
             start_coordinate = start_gate.coordinates
             goal = centre
             priority = algorithms.manhattan_heuristic(start_coordinate, goal)
             start_gate.priority += priority
+=======
+        for connection_nr in self.gate_connections:
+            connection = self.gate_connections[connection_nr]
+            gate_a = connection.gate_a
+            gate_b = connection.gate_b
+>>>>>>> test
 
+            gate_a_priority = algorithms.manhattan_heuristic(gate_a.coordinates, centre)
+            gate_b_priority = algorithms.manhattan_heuristic(gate_b.coordinates, centre)
+
+            priority = (gate_a_priority + gate_b_priority) / 2
+            connection.priority = priority
 
     def get_amount_of_connections_priority(self, connections_per_gate):
 
         for gate_nr,n_connections in connections_per_gate.items():
 
             priority = (6 - n_connections) / 2
+<<<<<<< HEAD
             for link in self.gate_links:
                 gate_a = link[0]
                 gate_b = link[1]
@@ -92,6 +116,16 @@ class SolvingLoop:
                 elif gate_nr == gate_b.nr:
                     gate_b.priority += priority              
 
+=======
+            for connection_nr in self.gate_connections:
+                connection = self.gate_connections[connection_nr]
+                gate_a = connection.gate_a
+                gate_b = connection.gate_b
+
+                if gate_nr == gate_a.nr or gate_nr == gate_b.nr:
+                    connection.priority += priority
+           
+>>>>>>> test
     def get_connections_per_gate(self):
 
         gate_n_connections = {}
@@ -124,79 +158,63 @@ class SolvingLoop:
 
         # Calculate priority for each connection
 
+<<<<<<< HEAD
         for link in self.gate_links:
 
             start_gate = link[0]
             goal_gate = link[1]
             start_coordinate = start_gate.coordinates
             goal_coordinate = goal_gate.coordinates
+=======
+         # TODO: sort the connection based on the lowest manhattan heuristic
+        for connection_nr in self.gate_connections:
+            connection = self.gate_connections[connection_nr]
+            gate_a = connection.gate_a
+            gate_b = connection.gate_b
+>>>>>>> test
 
-            priority = algorithms.manhattan_heuristic(start_coordinate, goal_coordinate)
+            priority = algorithms.manhattan_heuristic(gate_a.coordinates, gate_b.coordinates)
 
-            start_gate.priority += priority
+            connection.priority += priority
         
 
-    def solver(self, solving_queue):
+    def solver(self):
         algorithms = Algorithms()
 
         not_solved_counter = 0
 
-        while not solving_queue.empty():
-            current_connection = solving_queue.get()
-            path = algorithms.astar(self.grid, current_connection[0], current_connection[1])
+        sorted_connections = []
+
+        for connection in (sorted(self.gate_connections.values(), key=operator.attrgetter('priority'))):
+            sorted_connections.append(connection)
+
+        for sorted_connection in sorted_connections:
+            gate_a = sorted_connection.gate_a
+            gate_b = sorted_connection.gate_b
+
+            gate_a_coordinates = gate_a.coordinates
+            gate_b_coordinates = gate_b.coordinates
+
+            path = algorithms.astar(self.grid, gate_a_coordinates, gate_b_coordinates)
             # print(path)
             if path == None:
                 not_solved_counter += 1
-        self.not_solved_counter = not_solved_counter
+            self.not_solved_counter = not_solved_counter
 
     def random_selector(self):
-        priority = 1
 
-        for link in self.netlist:
-            option_list = random.choices(self.netlist, k=1)
-            option = option_list[0]
-            self.netlist.remove(option)
-            gate_nr = option[0]
-            gate = self.grid.gate_list[gate_nr - 1]
-            gate.priority += priority
-            priority += 1
-            
+        connection_numbers = []
+        for connection_nr in self.gate_connections.keys():
+            connection_numbers.append(connection_nr)
+        random.shuffle(connection_numbers)
 
-    def start(self, priority_option):
+        counter = 0
+        for connection_nr in connection_numbers:
 
-        # Try to solve using lowest length first
-        if priority_option == 1:
-            self.get_connection_length_priority()
-            pq = self.generate_pq()
-            self.solver(pq)
+            connection = self.gate_connections[counter]
+            connection.priority = connection_numbers[connection_nr]
+            print(connection.priority)
+            counter += 1
 
-        # Try to solve using closest to center first
-        elif priority_option == 2:
-            self.get_priority_center_grid()
-            pq = self.generate_pq()
-            self.solver(pq)
-
-        # Try to solve using number of connections per gate first
-        elif priority_option == 3:
-            connections_per_gate = self.get_connections_per_gate()
-            self.get_amount_of_connections_priority(connections_per_gate)
-            pq = self.generate_pq()
-            self.solver(pq)
-
-        elif priority_option == 4:
-            self.get_connection_length_priority()
-            self.get_priority_center_grid()
-            pq = self.generate_pq()
-            self.solver(pq)
-
-        elif priority_option == 5:
-            pq = self.generate_pq()
-            self.solver(pq)
-
-        elif priority_option == 6:
-            self.random_selector()
-            pq = self.generate_pq()
-            self.solver(pq)
-        
     def get_grid(self):
         return self.grid

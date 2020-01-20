@@ -4,31 +4,35 @@ from connection import Connection
 import random
 
 class Grid: 
-
+    counter = 0
     def __init__(self, chip_nr, netlist, remove_neighbors):
         self.chip_nr = chip_nr
         self.remove_neighbors = remove_neighbors
-        self.read_chip_csv(chip_nr)
+
+        # Global list that holds all 7 z levels of the x by y grids
+        self.mother_grid = {}
+
+        # Ordered list of all gates
+        self.gate_list = []
+
+        # List of connections made by the algorithm
+        self.connections_list = []
+
+        # List with all coordinates used by wires
+        self.all_wires = []
+
+        self.grid_max_x = 0
+        self.grid_max_y = 0
+
+        self.temporary_gate_list = []
+
+        self.gate_count = self.read_chip_csv(chip_nr)
+
         self.get_start_grid(chip_nr, netlist)
 
-    # Global list that holds all 7 z levels of the x by y grids
-    mother_grid = {}
+        self.wire_count = 0
 
-    # Ordered list of all gates
-    gate_list = []
-
-    # List of connections made by the algorithm
-    connections_list = []
-
-    # List with all coordinates used by wires
-    all_wires = []
-
-    grid_max_x = 0
-    grid_max_y = 0
-
-    temporary_gate_list = []
-
-    wire_count = 0
+        Grid.counter += 1
 
     # function to calculate how many gates a print list has
     def read_chip_csv(self, chip_nr):
@@ -67,7 +71,7 @@ class Grid:
 
         # Fill array with empty gates
         empty_gate = Gate(0, (0, 0, 0))
-        self.gate_list = [empty_gate] * self.read_chip_csv(chip_nr)
+        self.gate_list = [empty_gate] * self.gate_count
 
         for gate_data in self.temporary_gate_list:
             gate_nr = int(gate_data[0])

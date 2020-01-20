@@ -9,21 +9,24 @@ from test_solver import TestSolver
 
 if __name__ == "__main__":
 
-    netlist = netlistreader(1, 1)
+    for _ in range(10):
+        netlist = netlistreader(1, 1)
 
-    # # Make new grid instance
-    grid = Grid(1, netlist, True)
+        # # Make new grid instance
+        grid = Grid(1, netlist, False)
 
-    sl = SolvingLoop(grid, netlist)
+        sl = SolvingLoop(grid, netlist)
+        # connections_per_gate = sl.get_connections_per_gate()
 
-    sl.start(1)
+        sl.random_selector()
+        sl.solver()
 
-    print("Wires not solved %d " % (sl.not_solved_counter))
-    print("Wires solved %d" % (30 - sl.not_solved_counter))
-    print("Wires used: %d" % (grid.wire_count))
-    wires_per_connection = grid.wire_count / (30 - sl.not_solved_counter)
-    print("Wires per succesfull connection")
-    print(wires_per_connection)
+        print("Wires not solved %d " % (sl.not_solved_counter))
+        print("Wires solved %d" % (30 - sl.not_solved_counter))
+        print("Wires used: %d" % (grid.wire_count))
+        wires_per_connection = grid.wire_count / (30 - sl.not_solved_counter)
+        print("Wires per succesfull connection")
+        print(wires_per_connection)
 
     chip_plot = Plot(grid)
     chip_plot.plot()
