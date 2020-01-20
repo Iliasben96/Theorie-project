@@ -1,7 +1,8 @@
-from algorithms import Algorithms
-from grid import Grid
+from code.classes.grid import Grid
+from code.classes.connection import Connection
+from code.algorithms.algorithms import Algorithms
+
 import random
-from connection import Connection
 import operator
 
 class SolvingLoop:  

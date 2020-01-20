@@ -2,7 +2,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-from grid import Grid
+from code.classes.grid import Grid
 
 
 class Plot:
