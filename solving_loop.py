@@ -10,10 +10,11 @@ class SolvingLoop:
         self.grid = grid
         self.netlist = netlist
         self.not_solved_counter = 0
+        self.gate_connections = {}
         self.make_connections()
 
-    # Make sure this list contains gate objects instead of tuples
-    gate_connections = {}
+        # Make sure this list contains gate objects instead of tuples
+
 
     def make_connections(self):
         id_counter = 0
@@ -133,17 +134,19 @@ class SolvingLoop:
             self.not_solved_counter = not_solved_counter
 
     def random_selector(self):
-        priority = 1
 
-        for link in self.netlist:
-            option_list = random.choices(self.netlist, k=1)
-            option = option_list[0]
-            self.netlist.remove(option)
-            gate_nr = option[0]
-            gate = self.grid.gate_list[gate_nr - 1]
-            gate.priority += priority
-            priority += 1
-            
-        
+        connection_numbers = []
+        for connection_nr in self.gate_connections.keys():
+            connection_numbers.append(connection_nr)
+        random.shuffle(connection_numbers)
+
+        counter = 0
+        for connection_nr in connection_numbers:
+
+            connection = self.gate_connections[counter]
+            connection.priority = connection_numbers[connection_nr]
+            print(connection.priority)
+            counter += 1
+
     def get_grid(self):
         return self.grid
