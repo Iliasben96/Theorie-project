@@ -16,7 +16,7 @@ class SolvingLoop:
 
     # Create tuple from gate object
     def debug(self):
-        print (SolvingLoop.gate_links)
+        print (self.gate_links)
 
         # start_position = (start_gate.x, start_gate.y, start_gate.z)
         # goal_position = (goal_gate.x, goal_gate.y, goal_gate.z)
@@ -25,7 +25,7 @@ class SolvingLoop:
     def generate_pq(self):
 
         pq = PriorityQueue()
-        for link in SolvingLoop.gate_links:
+        for link in self.gate_links:
             tuple_link = []
 
             gate_start = link[0]
@@ -57,7 +57,7 @@ class SolvingLoop:
             link.append(start_gate)
             link.append(goal_gate)
 
-            SolvingLoop.gate_links.append(link)
+            self.gate_links.append(link)
 
     # Rebuild all functions to return priority instead of priority queue
     def get_priority_center_grid(self):
@@ -70,7 +70,7 @@ class SolvingLoop:
         centre = (centre_x, centre_y, 0)
 
         # TODO: sort the connection based on the lowest manhattan heuristic
-        for link in SolvingLoop.gate_links:
+        for link in self.gate_links:
             start_gate = link[0]
             start_coordinate = start_gate.coordinates
             goal = centre
@@ -83,7 +83,7 @@ class SolvingLoop:
         for gate_nr,n_connections in connections_per_gate.items():
 
             priority = (6 - n_connections) / 2
-            for link in SolvingLoop.gate_links:
+            for link in self.gate_links:
                 gate_a = link[0]
                 gate_b = link[1]
 
@@ -124,7 +124,7 @@ class SolvingLoop:
 
         # Calculate priority for each connection
 
-        for link in SolvingLoop.gate_links:
+        for link in self.gate_links:
 
             start_gate = link[0]
             goal_gate = link[1]

@@ -54,7 +54,7 @@ class Grid:
                 for i in range(0, 2):
                     row[i] = row[i].strip(',')
 
-                Grid.temporary_gate_list.append(row)
+                self.temporary_gate_list.append(row)
 
         return counter          
 
@@ -67,9 +67,9 @@ class Grid:
 
         # Fill array with empty gates
         empty_gate = Gate(0, (0, 0, 0))
-        Grid.gate_list = [empty_gate] * self.read_chip_csv(chip_nr)
+        self.gate_list = [empty_gate] * self.read_chip_csv(chip_nr)
 
-        for gate_data in Grid.temporary_gate_list:
+        for gate_data in self.temporary_gate_list:
             gate_nr = int(gate_data[0])
             gate_x = int(gate_data[1])
             gate_y = int(gate_data[2])
@@ -82,7 +82,7 @@ class Grid:
 
             # Create new gate object and add it to the list of gates
             new_gate = Gate(gate_nr, gate_coordinates)
-            Grid.gate_list[gate_nr - 1] = new_gate
+            self.gate_list[gate_nr - 1] = new_gate
 
         # Calculate max_x and max_y to create grids
         max_x = max(all_x)
@@ -97,8 +97,8 @@ class Grid:
 
         self.grid_max_y = grid_max_y
 
-        Grid.grid_max_x = grid_max_x
-        Grid.grid_max_y = grid_max_y
+        self.grid_max_x = grid_max_x
+        self.grid_max_y = grid_max_y
 
         # Create empty layers on top of base layer
         for z in range(0, 7):
@@ -113,14 +113,14 @@ class Grid:
                 # Add each row to the grid
                 grid[y] = row
 
-            Grid.mother_grid[z] = grid
+            self.mother_grid[z] = grid
 
         all_gate_neighbors = []
 
         connected_gates = []
 
         # Loop over all connections in gate list
-        for gate in Grid.gate_list:
+        for gate in self.gate_list:
 
             # Check if the gate is in the netlist
             for connection in netlist:
@@ -131,7 +131,7 @@ class Grid:
 
             # Remove coordinates of gates from grid
             gate_coordinates = gate.coordinates
-            base_grid = Grid.mother_grid[gate_coordinates[2]]
+            base_grid = self.mother_grid[gate_coordinates[2]]
             correct_row = base_grid[gate_coordinates[1]]
             correct_row.remove(gate_coordinates[0])
 
@@ -139,7 +139,7 @@ class Grid:
             # For each gate that has a connection according to the netlist
             for gate_nr in connected_gates:
 
-                gate = Grid.gate_list[gate_nr - 1]
+                gate = self.gate_list[gate_nr - 1]
                 # Get neighbors of this gate
                 neighbors = self.get_neighbors(gate.coordinates)
 
@@ -152,18 +152,18 @@ class Grid:
             # Remove all neighbors from grid
             for gate_neighbor in all_gate_neighbors:
 
-                base_grid = Grid.mother_grid[gate_neighbor[2]]
+                base_grid = self.mother_grid[gate_neighbor[2]]
                 correct_row = base_grid[gate_neighbor[1]]
                 
                 for x in correct_row:
                     if gate_neighbor[0] == x:
                         correct_row.remove(gate_neighbor[0])
 
-        return Grid.mother_grid
+        return self.mother_grid
 
     # Function that prints out all layers of the grid to the console
     def print_grid(self, z):
-        base_grid = Grid.mother_grid[z]
+        base_grid = self.mother_grid[z]
         for y, x in base_grid.items():
             print("Y = %d"% (y))
             print(x)
@@ -176,7 +176,7 @@ class Grid:
         z = position[2]
 
         neighbors = []
-        mother_grid = Grid.mother_grid
+        mother_grid = self.mother_grid
         grid = mother_grid[z]
 
         # All possible moving positions
@@ -226,23 +226,23 @@ class Grid:
         # Check if neigbors are legal, add legal ones to list of neighbors
 
         up_neighbor = (x, y_up, z)
-        if up_neighbor not in Grid.all_wires: 
+        if up_neighbor not in self.all_wires: 
             neighbors.append(up_neighbor)
 
         down_neighbor = (x, y_down, z)
-        if down_neighbor not in Grid.all_wires:
+        if down_neighbor not in self.all_wires:
             neighbors.append(down_neighbor)
 
         left_neighbor = (x_left, y, z)
-        if left_neighbor not in Grid.all_wires:
+        if left_neighbor not in self.all_wires:
             neighbors.append(left_neighbor)
 
         right_neighbor = (x_right, y, z)
-        if right_neighbor not in Grid.all_wires:
+        if right_neighbor not in self.all_wires:
             neighbors.append(right_neighbor)
 
         level_up_neighbor = (x, y, z_level_up)
-        if level_up_neighbor not in Grid.all_wires:
+        if level_up_neighbor not in self.all_wires:
             neighbors.append(level_up_neighbor)
 
         return(neighbors)
@@ -251,16 +251,16 @@ class Grid:
     def put_connection(self, connection):
         for wire in connection:
 
-            base_grid = Grid.mother_grid[wire[2]]
+            base_grid = self.mother_grid[wire[2]]
 
             correct_row = base_grid[wire[1]]
 
             correct_row.remove(wire[0])
 
             # Count total length of all wires
-            Grid.wire_count += 1
+            self.wire_count += 1
 
-        Grid.connections_list.append(connection)
+        self.connections_list.append(connection)
 
     # Add start and end gates as walkable terrain when they are being used
     def add_start_end_gates(self, start, goal):
@@ -271,7 +271,7 @@ class Grid:
         goal_x = goal[0]
         goal_y = goal[1]
 
-        grid = Grid.mother_grid[base_grid_index]
+        grid = self.mother_grid[base_grid_index]
 
         start_correct_row = grid[start_y]
         start_correct_row.append(start_x)
@@ -279,7 +279,7 @@ class Grid:
         end_correct_row = grid[goal_y]
         end_correct_row.append(goal_x)
 
-        Grid.mother_grid[base_grid_index] = grid
+        self.mother_grid[base_grid_index] = grid
 
     # Add back neighbors as walkable terrain
     def add_back_gate_neighbors(self, start, goal):
@@ -291,7 +291,7 @@ class Grid:
         for start_neighbor in start_neighbors:
 
             # Check if the neighbor has a wire in its place
-            for wire in Grid.all_wires:
+            for wire in self.all_wires:
                 
                 if start_neighbor == wire:
                     found_wire == True
@@ -299,7 +299,7 @@ class Grid:
             neighbor_already_placed = False
             # Only add back the neighbor as walkable terrain if it is not a wire
             if found_wire == False:
-                base_grid = Grid.mother_grid[start_neighbor[2]]
+                base_grid = self.mother_grid[start_neighbor[2]]
                 start_neighbor_correct_row = base_grid[start_neighbor[1]]
                 for x in start_neighbor_correct_row:
                     
@@ -307,7 +307,7 @@ class Grid:
                         neighbor_already_placed = True
                 if neighbor_already_placed == False:
                     start_neighbor_correct_row.append(start_neighbor[0])
-                    Grid.mother_grid[start_neighbor[2]][start_neighbor[1]] = start_neighbor_correct_row
+                    self.mother_grid[start_neighbor[2]][start_neighbor[1]] = start_neighbor_correct_row
 
         goal_neighbors = self.get_gate_neighbors(goal)
 
@@ -315,7 +315,7 @@ class Grid:
 
         for goal_neighbor in goal_neighbors:
 
-            for wire in Grid.all_wires:
+            for wire in self.all_wires:
 
                 if goal_neighbor == wire:
                     found_wire == True
@@ -323,7 +323,7 @@ class Grid:
             neighbor_already_placed = False
                     
             if found_wire == False:
-                base_grid = Grid.mother_grid[goal_neighbor[2]]
+                base_grid = self.mother_grid[goal_neighbor[2]]
                 goal_neighbor_correct_row = base_grid[goal_neighbor[1]]
                 for x in goal_neighbor_correct_row:                    
                     if x == goal_neighbor[0]:
@@ -331,7 +331,7 @@ class Grid:
                 if neighbor_already_placed == False:
                     # print("Neighbor not yet placed")
                     goal_neighbor_correct_row.append(goal_neighbor[0])
-                    Grid.mother_grid[goal_neighbor[2]][goal_neighbor[1]] = goal_neighbor_correct_row
+                    self.mother_grid[goal_neighbor[2]][goal_neighbor[1]] = goal_neighbor_correct_row
 
     def relock_gate_neighbors(self, start, goal):
 
@@ -341,7 +341,7 @@ class Grid:
         start_neighbors = self.get_gate_neighbors(start)
 
         for start_neighbor in start_neighbors:
-            grid = Grid.mother_grid[start_neighbor[2]]
+            grid = self.mother_grid[start_neighbor[2]]
             start_neighbor_correct_row = grid[start_neighbor[1]]
 
             if start_neighbor[0] in start_neighbor_correct_row:
@@ -350,7 +350,7 @@ class Grid:
         goal_neighbors = self.get_gate_neighbors(goal)
 
         for goal_neighbor in goal_neighbors:
-            grid = Grid.mother_grid[goal_neighbor[2]]
+            grid = self.mother_grid[goal_neighbor[2]]
             goal_neighbor_correct_row = grid[goal_neighbor[1]]
             if goal_neighbor[0] in goal_neighbor_correct_row:
                 goal_neighbor_correct_row.remove(goal_neighbor[0])
