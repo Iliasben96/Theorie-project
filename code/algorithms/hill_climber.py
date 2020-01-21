@@ -1,31 +1,36 @@
 from code.algorithms.random_priority import get_random_priority
+from code.classes.chip_solver import ChipSolver
 
-def hill_climber(self, gate_connections):
-        gate_connections = get_random_priority(gate_connections)
-        ordered_connection_list = self.solver()
-        not_solved_counter = 0 
-        current_best_solution = len(self.netlist)
-        solution_found = False
-        while solution_found == False:
-            if solution_found == False:
-                for j in range(len(ordered_connection_list)):
-                    if solution_found == False:
-                        for i in range(len(ordered_connection_list)):
-                            temp_order = ordered_connection_list
-                            temp_order[j], temp_order[i] = temp_order[i], temp_order[j]
-                            counter = 0
-                            for connection_nr in temp_order:
-                                connection = self.gate_connections[counter]
-                                connection.priority = self.connection_numbers[connection_nr]
-                                counter += 1
-                            
-                            # output van solver met aantal mislukte connecties voor de connection
-                            
-                            if not_solved_counter < current_best_solution:
-                                current_best_solution = not_solved_counter
-                                ordered_connection_list = temp_order
-                            
-                            if current_best_solution == 0:
-                                print("solution Found")
-                                solution_found = True
-                                break
+def hill_climber(grid, netlist, gate_connections):
+
+        solved = False
+        random_gate_connections = get_random_priority(gate_connections)
+        cs = ChipSolver(grid, netlist)
+        random_sorted_connections = cs.sort_connections(random_gate_connections)
+        current_score = cs.make_connections(random_sorted_connections)
+        if current_score == 0: 
+            solved = True
+        counter = 0 
+        state = random_sorted_connections
+        while solved == False and counter < 10:
+            i = 0
+            for connection in state:
+                previous_state = state
+                temp_priority = connection.priority 
+                connection.priority = state[i + 1].priority
+                state[i + 1].priority = temp_priority
+
+                resorted_connections = cs.sort_connections(state)
+                score = cs.make_connections(resorted_connections)
+                if score == 0:
+                    print("Yas, gelukt")
+                    return state
+                if score > current_score:
+                    state = previous_state
+                else: 
+                    current_score = score
+                i += 1
+
+
+
+

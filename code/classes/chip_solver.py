@@ -15,10 +15,12 @@ class ChipSolver:
         self.gate_connections = grid.gate_connections
 
     def sort_connections(self, gate_connections):
-        sorted_connections = []
+        sorted_connections = {}
 
+        counter = 0
         for connection in (sorted(gate_connections.values(), key=operator.attrgetter('priority'))):
-            sorted_connections.append(connection)
+            sorted_connections[counter] = connection
+            counter += 1
 
         return sorted_connections
 
@@ -33,7 +35,7 @@ class ChipSolver:
                 not_solved_counter += 1
             self.not_solved_counter = not_solved_counter
 
-        return sorted_connections
+        return not_solved_counter
 
     def start(self, option):
         if option == 1:
