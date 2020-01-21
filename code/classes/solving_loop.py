@@ -13,6 +13,7 @@ class SolvingLoop:
         self.not_solved_counter = 0
         self.gate_connections = {}
         self.make_connections()
+        self.connection_numbers = []
 
         # Make sure this list contains gate objects instead of tuples
 
@@ -138,17 +139,106 @@ class SolvingLoop:
 
     def random_selector(self):
 
-        connection_numbers = []
         for connection_nr in self.gate_connections.keys():
-            connection_numbers.append(connection_nr)
-        random.shuffle(connection_numbers)
+            self.connection_numbers.append(connection_nr)
+        random.shuffle(self.connection_numbers)
 
         counter = 0
-        for connection_nr in connection_numbers:
+        for connection_nr in self.connection_numbers:
 
             connection = self.gate_connections[counter]
-            connection.priority = connection_numbers[connection_nr]
+            connection.priority = self.connection_numbers[connection_nr]
             counter += 1
 
     def get_grid(self):
         return self.grid
+
+    def hill_climber(self):
+        self.random_selector()
+        ordered_connection_list = self.solver()
+        not_solved_counter = 0 
+        current_best_solution = len(self.netlist)
+        solution_found = False
+        while solution_found == False:
+            if solution_found == False:
+                for j in range(len(ordered_connection_list)):
+                    if solution_found == False:
+                        for i in range(len(ordered_connection_list)):
+                            temp_order = ordered_connection_list
+                            temp_order[j], temp_order[i] = temp_order[i], temp_order[j]
+                            counter = 0
+                            for connection_nr in temp_order:
+                                connection = self.gate_connections[counter]
+                                connection.priority = self.connection_numbers[connection_nr]
+                                counter += 1
+                            
+                            # output van solver met aantal mislukte connecties voor de connection
+                            
+                            if not_solved_counter < current_best_solution:
+                                current_best_solution = not_solved_counter
+                                ordered_connection_list = temp_order
+                            
+                            if current_best_solution == 0:
+                                print("solution Found")
+                                solution_found = True
+                                break
+                            
+
+                    
+
+
+
+        # self.random_selector()
+        # ordered_connection_list = self.solver()
+        # algorithms = Algorithms()
+        # not_solved_counter = 0
+        # current_best_solution = len(self.netlist)
+        # solution_found = False
+        # while current_best_solution != 0:
+        #     # For connection in ordered_connection_list
+        #     for j in range(len(ordered_connection_list)):
+        #         if solution_found == False:
+        #             for i in range(len(ordered_connection_list)):
+        #                 if ordered_connection_list[j] != ordered_connection_list[i]:
+        #                     temp_order = ordered_connection_list
+        #                     temp_order[j], temp_order[i] = temp_order[i], temp_order[j]
+        #                     if solution_found == False:
+        #                         for connection in temp_order:
+        #                             gate_a = connection.gate_a
+        #                             gate_b = connection.gate_b
+
+        #                             gate_a_coordinates = gate_a.coordinates
+        #                             gate_b_coordinates = gate_b.coordinates
+
+        #                             path = algorithms.astar(self.grid, gate_a_coordinates, gate_b_coordinates)
+
+        #                             if path == None:
+        #                                 not_solved_counter += 1
+
+        #                             if not_solved_counter < current_best_solution:
+        #                                 current_best_solution = not_solved_counter
+        #                                 ordered_connection_list = temp_order
+        #                                 print("improved")
+                                    
+        #                                 for connection in ordered_connection_list:
+        #                                     print(connection)
+        #                                 print(current_best_solution)
+
+        #                             if current_best_solution == 0:
+        #                                 print("solution found")
+        #                                 solution_found = True
+        #                                 break
+        #                     else:
+        #                         break
+        
+        # voor het eerst getal in de eerste iteratie wil ik alle andere oplossingen bekijken als ik deze en een andere wissel van plek
+        # na het checken van alle opties voor deze iteratie selecteer een de beste van alle opties(als er een verbetering is)
+        # maak de nieuwe volgorde met die list de base grid en selecteer de tweede in de lijst etc
+        # tot er een oplossing is gevonden
+                
+                
+
+
+            
+
+    
