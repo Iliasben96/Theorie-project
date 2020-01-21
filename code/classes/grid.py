@@ -5,9 +5,15 @@ import random
 
 class Grid: 
     counter = 0
+
     def __init__(self, chip_nr, netlist, remove_neighbors):
         self.chip_nr = chip_nr
+
+        # Option to apply heuristic to remove neighbors from grid when they're not used
+        # Accepts True or False statement
         self.remove_neighbors = remove_neighbors
+
+        self.netlist = netlist
 
         # Global list that holds all 7 z levels of the x by y grids
         self.mother_grid = {}
@@ -17,6 +23,8 @@ class Grid:
 
         # List of connections made by the algorithm
         self.connections_list = []
+
+        self.gate_connections = {}
 
         # List with all coordinates used by wires
         self.all_wires = []
@@ -28,13 +36,17 @@ class Grid:
 
         self.gate_count = self.read_chip_csv(chip_nr)
 
-        self.get_start_grid(chip_nr, netlist)
+        self.get_start_grid(chip_nr)
+
+        self.make_connections()
 
         self.wire_count = 0
 
         Grid.counter += 1
 
-    # function to calculate how many gates a print list has
+    """
+    function to calculate how many gates a print list has
+    """
     def read_chip_csv(self, chip_nr):
         counter = 0
 
@@ -62,8 +74,10 @@ class Grid:
 
         return counter          
 
-    # Create the start grid according to a chip_nr with a set amount of gates
-    def get_start_grid(self, chip_nr, netlist):
+    """
+    Create the start grid according to a chip_nr with a set amount of gates
+    """
+    def get_start_grid(self, chip_nr):
 
         # Lists to later figure out the maximum coordinates of a gate
         all_x = []
@@ -119,15 +133,13 @@ class Grid:
 
             self.mother_grid[z] = grid
 
-        all_gate_neighbors = []
-
         connected_gates = []
 
         # Loop over all connections in gate list
         for gate in self.gate_list:
 
             # Check if the gate is in the netlist
-            for connection in netlist:
+            for connection in self.netlist:
                 if gate.nr in connection and gate.nr not in connected_gates:
 
                     # If it is, add the nummber to a new list
@@ -138,6 +150,20 @@ class Grid:
             base_grid = self.mother_grid[gate_coordinates[2]]
             correct_row = base_grid[gate_coordinates[1]]
             correct_row.remove(gate_coordinates[0])
+
+        if self.remove_neighbors == True:
+            self.remove_gate_neighbors(connected_gates)
+
+        return self.mother_grid
+
+    """
+    Removes neighbors of every gate from the grid
+    """
+    def remove_gate_neighbors(self, connected_gates):
+
+        all_gate_neighbors = []
+
+        connected_gates = []
 
         if self.remove_neighbors == True:
             # For each gate that has a connection according to the netlist
@@ -163,16 +189,26 @@ class Grid:
                     if gate_neighbor[0] == x:
                         correct_row.remove(gate_neighbor[0])
 
-        return self.mother_grid
 
-    # Function that prints out all layers of the grid to the console
-    def print_grid(self, z):
-        base_grid = self.mother_grid[z]
-        for y, x in base_grid.items():
-            print("Y = %d"% (y))
-            print(x)
+    def make_connections(self):
+        id_counter = 0
+        for connection in self.netlist:
 
-    # Function that returns all neighbors of a position
+            # Get gate numbers from netlist
+            gate_a_nr = connection[0]
+            gate_b_nr = connection[1]
+
+            # Get corresponding gates from gate_list
+            start_gate = self.gate_list[gate_a_nr - 1]
+            goal_gate = self.gate_list[gate_b_nr - 1]
+
+            new_connection = Connection(start_gate, goal_gate, id_counter)
+            self.gate_connections[id_counter] = new_connection
+            id_counter += 1
+
+    """ 
+    Function that returns all neighbors of a position
+    """
     def get_neighbors(self, position):
 
         x = position[0]
@@ -213,6 +249,9 @@ class Grid:
 
         return(neighbors)
 
+    """
+    Get neighbors of all gates
+    """
     def get_gate_neighbors(self, position):
         x = position[0]
         y = position[1]
@@ -251,7 +290,9 @@ class Grid:
 
         return(neighbors)
 
-    # Function that adds a set of wires, called connection, to a list of connections
+    """
+    Function that adds a set of wires, called connection, to a list of connections
+    """
     def put_connection(self, connection):
         for wire in connection:
 
@@ -266,7 +307,9 @@ class Grid:
 
         self.connections_list.append(connection)
 
-    # Add start and end gates as walkable terrain when they are being used
+    """
+    Add start and end gates as walkable terrain when they are being used
+    """
     def add_start_end_gates(self, start, goal):
         start_x = start[0]
         start_y = start[1]
@@ -285,7 +328,9 @@ class Grid:
 
         self.mother_grid[base_grid_index] = grid
 
-    # Add back neighbors as walkable terrain
+    """
+    Add back neighbors as walkable terrain
+    """
     def add_back_gate_neighbors(self, start, goal):
         start_neighbors = self.get_gate_neighbors(start)
 
@@ -301,6 +346,7 @@ class Grid:
                     found_wire == True
                     
             neighbor_already_placed = False
+            
             # Only add back the neighbor as walkable terrain if it is not a wire
             if found_wire == False:
                 base_grid = self.mother_grid[start_neighbor[2]]
@@ -337,6 +383,9 @@ class Grid:
                     goal_neighbor_correct_row.append(goal_neighbor[0])
                     self.mother_grid[goal_neighbor[2]][goal_neighbor[1]] = goal_neighbor_correct_row
 
+    """
+    Relock the neighbors of the gate 
+    """
     def relock_gate_neighbors(self, start, goal):
 
         grid = {} 
