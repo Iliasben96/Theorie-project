@@ -2,7 +2,7 @@ from code.classes.netlist_reader import netlistreader
 from code.classes.grid import Grid
 from code.classes.gate import Gate
 from code.visualisation.plot import Plot
-from code.classes.solving_loop import SolvingLoop
+from code.classes.chip_solver import ChipSolver
 
 if __name__ == "__main__":
 
@@ -29,7 +29,7 @@ if __name__ == "__main__":
             netlist_nr = input("Error: please choose netlist number (1, 2, or 3): ")
     
     if chip_nr == 2:
-        netlist_nr = input("Please choose netlist number (4, 5, or 5): ")
+        netlist_nr = input("Please choose netlist number (4, 5, or 6): ")
 
         while netlist_nr.isdigit() == False:
             netlist_nr = input("Error: please choose netlist number (4, 5, or 6): ")
@@ -44,23 +44,34 @@ if __name__ == "__main__":
         heuristic_nr = input("Error: please choose heuristic number (1 through 5): ")
     
     heuristic_nr = int(heuristic_nr)
-    while heuristic_nr < 0 or netlist_nr > 5:
+    while heuristic_nr < 0 or netlist_nr > 6:
         netlist_nr = input("Error: please choose heuristic number (1 through 5): ")
+
+    neighbor_lock_input = input("Do you want to enable gate locking? (yes/no) ")
+
+    while neighbor_lock_input != "yes" and neighbor_lock_input != "no":
+        neighbor_lock_input = input("Error: please provide proper input (yes/no) ")
+    
+    neighbor_lock = False
+    if neighbor_lock_input == "yes":
+        neighbor_lock = True
+
 
     netlist = netlistreader(chip_nr,netlist_nr)
 
     # # Make new grid instance
-    grid = Grid(chip_nr, netlist, True)
+    grid = Grid(chip_nr, netlist, neighbor_lock)
 
-    sl = SolvingLoop(grid, netlist)
-    # connections_per_gate = sl.get_connections_per_gate()
+    chip_solver = ChipSolver(grid, netlist)
 
-    sl.start(heuristic_nr)
+    chip_solver.start(heuristic_nr)
 
-    print("Wires not solved %d " % (sl.not_solved_counter))
-    print("Wires solved %d" % (30 - sl.not_solved_counter))
+    total_connections = len(netlist)
+
+    print("Wires not solved %d " % (chip_solver.not_solved_counter))
+    print("Wires solved %d" % (total_connections - chip_solver.not_solved_counter))
     print("Wires used: %d" % (grid.wire_count))
-    wires_per_connection = grid.wire_count / (30 - sl.not_solved_counter)
+    wires_per_connection = grid.wire_count / (total_connections - chip_solver.not_solved_counter)
     print("Wires per succesfull connection")
     print(wires_per_connection)
 
