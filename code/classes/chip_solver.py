@@ -28,6 +28,9 @@ class ChipSolver:
 
         not_solved_counter = 0
 
+        # TODO!!!!!!!
+        # Make sure this loops over the values of the DICTIONARY sorted_connections
+        # This is not a list anymore, but a dict, make that work
         for sorted_connection in sorted_connections:
             path = astar(self.grid, sorted_connection)
             # print(path)
