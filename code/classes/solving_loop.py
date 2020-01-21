@@ -3,7 +3,7 @@ from code.classes.connection import Connection
 from code.algorithms.astar import astar
 from code.heuristics.manhattan import manhattan_heuristic
 from code.heuristics.connection_length import get_connection_length_priority
-from code.heuristics.random_priority import get_random_priority
+from code.algorithms.random_priority import get_random_priority
 from code.heuristics.connection_amount import get_amount_of_connections_priority
 from code.heuristics.center_grid import get_priority_center_grid
 
