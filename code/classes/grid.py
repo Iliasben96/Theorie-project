@@ -407,3 +407,40 @@ class Grid:
             goal_neighbor_correct_row = grid[goal_neighbor[1]]
             if goal_neighbor[0] in goal_neighbor_correct_row:
                 goal_neighbor_correct_row.remove(goal_neighbor[0])
+
+    def increase_level(self):
+        # Select correct wires
+        for connection in self.connections_list:
+            if len(connection) > 4:
+                second_wire = connection[1]
+                second_last_wire = connection[-2]
+
+                # Create new wire with added Z coördinate
+                insert_third_wire_list = list(second_wire)
+                insert_third_wire_list[2] += 1
+                insert_third_wire = tuple(insert_third_wire_list)
+
+                # Create new wire with added Z coördinate
+                insert_third_last_wire_list = list(second_last_wire)
+                insert_third_last_wire_list[2] += 1
+                insert_third_last_wire = tuple(insert_third_last_wire_list)
+
+                # Insert third and third to last wire
+                connection.insert(2, insert_third_wire)
+                connection.insert(-2, insert_third_last_wire)
+
+        # Increase Z coördinate of every cable between third and third to last wire
+        for connection in self.connections_list:
+            if len(connection) > 4:
+                counter = 0
+                max_wires = len(connection)
+                for wire in connection:
+                    if (max_wires - 3) > counter and counter > 2:
+                        list_wire = list(wire)
+                        list_wire[2] += 1
+                        insert_wire = tuple(list_wire)
+                    else:
+                        insert_wire = wire
+                    connection[counter] = insert_wire
+                    counter += 1
+            print(connection)
