@@ -23,7 +23,10 @@ class Z_Up:
             if path == None:
                 unsolved_dict[i] = sorted_connection
                 self.not_solved_counter += 1
+                # print(i)
                 i += 1
+                # print(sorted_connection.gate_a)
+                # print(sorted_connection.gate_b)
         return unsolved_dict
 
     def run(self):
@@ -32,10 +35,10 @@ class Z_Up:
         to_solve = self.sorted_connections
         not_solved = self.solver(to_solve)
         while not_solved != False:
-            self.grid.increase_level()
-            not_solved = self.solver(not_solved)
             if counter > 1:
                 print("Oeps, out of bounds")
                 break
+            self.grid.increase_level()
+            not_solved = self.solver(not_solved)
             counter += 1
         self.not_solved_counter = len(not_solved)

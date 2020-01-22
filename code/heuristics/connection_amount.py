@@ -12,7 +12,8 @@ def get_amount_of_connections_priority(netlist, gate_connections):
 
             if gate_nr == gate_a.nr or gate_nr == gate_b.nr:
                 connection.priority += priority
-    return connections_per_gate
+
+    return gate_connections
         
 def get_connections_per_gate(netlist):
 

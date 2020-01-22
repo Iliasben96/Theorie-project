@@ -1,5 +1,7 @@
 from code.classes.gate import Gate
 from code.classes.connection import Connection
+from code.heuristics.connection_amount import get_connections_per_gate
+
 import csv
 import random
 
@@ -84,13 +86,20 @@ class Grid:
         all_y = []
 
         # Fill array with empty gates
-        empty_gate = Gate(0, (0, 0, 0))
+        empty_gate = Gate(0, (0, 0, 0), 0)
         self.gate_list = [empty_gate] * self.gate_count
+
+        connections_per_gate = get_connections_per_gate(self.netlist)
+        print(connections_per_gate)
 
         for gate_data in self.temporary_gate_list:
             gate_nr = int(gate_data[0])
             gate_x = int(gate_data[1])
             gate_y = int(gate_data[2])
+            gate_connection_amount = 0
+            if gate_nr in connections_per_gate:
+                gate_connection_amount = connections_per_gate[gate_nr]
+
 
             gate_coordinates = (gate_x, gate_y, 0)
 
@@ -99,7 +108,7 @@ class Grid:
             all_y.append(gate_y)
 
             # Create new gate object and add it to the list of gates
-            new_gate = Gate(gate_nr, gate_coordinates)
+            new_gate = Gate(gate_nr, gate_coordinates, gate_connection_amount)
             self.gate_list[gate_nr - 1] = new_gate
 
         # Calculate max_x and max_y to create grids
@@ -137,7 +146,6 @@ class Grid:
 
         # Loop over all connections in gate list
         for gate in self.gate_list:
-
             # Check if the gate is in the netlist
             for connection in self.netlist:
                 if gate.nr in connection and gate.nr not in connected_gates:
@@ -153,6 +161,7 @@ class Grid:
 
         if self.remove_neighbors == True:
             self.remove_gate_neighbors(connected_gates)
+            print("Joe joe")
 
         return self.mother_grid
 
@@ -163,8 +172,6 @@ class Grid:
 
         all_gate_neighbors = []
 
-        connected_gates = []
-
         if self.remove_neighbors == True:
             # For each gate that has a connection according to the netlist
             for gate_nr in connected_gates:
@@ -172,12 +179,13 @@ class Grid:
                 gate = self.gate_list[gate_nr - 1]
                 # Get neighbors of this gate
                 neighbors = self.get_neighbors(gate.coordinates)
-
                 for neighbor in neighbors:
 
                     if neighbor not in all_gate_neighbors:
 
                         all_gate_neighbors.append(neighbor)
+                        gate.neighbors.append(neighbor)
+                        print(gate.neighbors)
 
             # Remove all neighbors from grid
             for gate_neighbor in all_gate_neighbors:

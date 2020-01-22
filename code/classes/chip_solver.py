@@ -61,7 +61,9 @@ class ChipSolver:
             sorted_gate_connections = self.sort_connections(prioritised_gate_connections)
             self.make_connections(sorted_gate_connections)
         if option == 7:
-            z_up = Z_Up(self.gate_connections, self.grid, self.not_solved_counter)
+            prioritised_gate_connections = get_amount_of_connections_priority(self.netlist, self.gate_connections)
+            sorted_gate_connections = self.sort_connections(prioritised_gate_connections)
+            z_up = Z_Up(sorted_gate_connections, self.grid, self.not_solved_counter)
             z_up.run()
             self.not_solved_counter = z_up.not_solved_counter
 
