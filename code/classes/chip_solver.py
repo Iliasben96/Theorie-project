@@ -1,6 +1,6 @@
 from code.algorithms.astar import astar
 from code.heuristics.connection_length import get_connection_length_priority
-from code.algorithms.random_priority import get_random_priority
+from code.heuristics.random_priority import get_random_priority
 from code.heuristics.connection_amount import get_amount_of_connections_priority
 from code.heuristics.center_grid import get_priority_center_grid
 
@@ -28,10 +28,7 @@ class ChipSolver:
 
         not_solved_counter = 0
 
-        # TODO!!!!!!!
-        # Make sure this loops over the values of the DICTIONARY sorted_connections
-        # This is not a list anymore, but a dict, make that work
-        for sorted_connection in sorted_connections:
+        for sorted_connection in sorted_connections.values():
             path = astar(self.grid, sorted_connection)
             # print(path)
             if path == None:

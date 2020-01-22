@@ -3,6 +3,7 @@ from code.classes.grid import Grid
 from code.classes.gate import Gate
 from code.visualisation.plot import Plot
 from code.classes.chip_solver import ChipSolver
+from code.algorithms.random_loop import start_random_solutions
 
 if __name__ == "__main__":
 
@@ -38,14 +39,15 @@ if __name__ == "__main__":
         while netlist_nr < 4 or netlist_nr > 6:
             netlist_nr = input("Error: please choose netlist number (4, 5, or 6): ")
     
-    heuristic_nr = input("What heuristics do you want to run? \n 1: none, 2: connection_length, 3: random, 4: amount of connections, 5: center grid: ")     
+    heuristic_nr = input("What heuristics do you want to run? \n 1: none, 2:" + 
+    "connection_length, 3: random, 4: amount of connections, 5: center grid: 6: random_iterations: ")     
 
     while heuristic_nr.isdigit() == False:
-        heuristic_nr = input("Error: please choose heuristic number (1 through 5): ")
+        heuristic_nr = input("Error: please choose heuristic number (1 through 6): ")
     
     heuristic_nr = int(heuristic_nr)
-    while heuristic_nr < 0 or netlist_nr > 6:
-        netlist_nr = input("Error: please choose heuristic number (1 through 5): ")
+    while heuristic_nr < 0 or netlist_nr > 7:
+        netlist_nr = input("Error: please choose heuristic number (1 through 6): ")
 
     neighbor_lock_input = input("Do you want to enable gate locking? (yes/no) ")
 
@@ -59,21 +61,35 @@ if __name__ == "__main__":
 
     netlist = netlistreader(chip_nr,netlist_nr)
 
-    # # Make new grid instance
-    grid = Grid(chip_nr, netlist, neighbor_lock)
+    if heuristic_nr == 6:
+        iterations = input("How many iterations do you want to try: ")
+        while iterations.isdigit() == False:
+            iterations = input("Error: please provide a number higher than zero: ")
+        iterations = int(iterations)
 
-    chip_solver = ChipSolver(grid, netlist)
+        while iterations < 0:
+            iterations = input("Error: please provide a number higher than zero: ")
+        
+        solved = start_random_solutions(chip_nr, netlist, neighbor_lock, iterations)
+        if solved == False:
+            print("no solution found")
 
-    chip_solver.start(heuristic_nr)
+    else:
+        # # Make new grid instance
+        grid = Grid(chip_nr, netlist, neighbor_lock)
 
-    total_connections = len(netlist)
+        chip_solver = ChipSolver(grid, netlist)
 
-    print("Wires not solved %d " % (chip_solver.not_solved_counter))
-    print("Wires solved %d" % (total_connections - chip_solver.not_solved_counter))
-    print("Wires used: %d" % (grid.wire_count))
-    wires_per_connection = grid.wire_count / (total_connections - chip_solver.not_solved_counter)
-    print("Wires per succesfull connection")
-    print(wires_per_connection)
+        chip_solver.start(heuristic_nr)
 
-    chip_plot = Plot(grid)
-    chip_plot.plot()
+        total_connections = len(netlist)
+
+        print("Wires not solved %d " % (chip_solver.not_solved_counter))
+        print("Wires solved %d" % (total_connections - chip_solver.not_solved_counter))
+        print("Wires used: %d" % (grid.wire_count))
+        wires_per_connection = grid.wire_count / (total_connections - chip_solver.not_solved_counter)
+        print("Wires per succesfull connection")
+        print(wires_per_connection)
+
+        chip_plot = Plot(grid)
+        chip_plot.plot()
