@@ -3,6 +3,7 @@ from code.heuristics.connection_length import get_connection_length_priority
 from code.heuristics.random_priority import get_random_priority
 from code.heuristics.connection_amount import get_amount_of_connections_priority
 from code.heuristics.center_grid import get_priority_center_grid
+from code.heuristics.z_up import Z_Up
 
 import operator
 
@@ -59,3 +60,9 @@ class ChipSolver:
             prioritised_gate_connections = get_priority_center_grid(self.grid, self.gate_connections)
             sorted_gate_connections = self.sort_connections(prioritised_gate_connections)
             self.make_connections(sorted_gate_connections)
+        if option == 7:
+            z_up = Z_Up(self.gate_connections, self.grid, self.not_solved_counter)
+            z_up.run()
+            self.not_solved_counter = z_up.not_solved_counter
+
+

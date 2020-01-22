@@ -40,14 +40,15 @@ if __name__ == "__main__":
             netlist_nr = input("Error: please choose netlist number (4, 5, or 6): ")
     
     heuristic_nr = input("What heuristics do you want to run? \n 1: none, 2:" + 
-    "connection_length, 3: random, 4: amount of connections, 5: center grid: 6: random_iterations: ")     
+    "connection_length, 3: random, 4: amount of connections, 5: center grid: 6: random_iterations:" +
+    " 7: level up: ")     
 
     while heuristic_nr.isdigit() == False:
-        heuristic_nr = input("Error: please choose heuristic number (1 through 6): ")
+        heuristic_nr = input("Error: please choose heuristic number (1 through 7): ")
     
     heuristic_nr = int(heuristic_nr)
     while heuristic_nr < 0 or netlist_nr > 7:
-        netlist_nr = input("Error: please choose heuristic number (1 through 6): ")
+        netlist_nr = input("Error: please choose heuristic number (1 through 7): ")
 
     neighbor_lock_input = input("Do you want to enable gate locking? (yes/no) ")
 

@@ -1,28 +1,41 @@
-    def solver(self):
-        algorithms = Algorithms()
+from code.algorithms.astar import astar
+from code.heuristics.connection_length import get_connection_length_priority
+from code.heuristics.random_priority import get_random_priority
+from code.heuristics.connection_amount import get_amount_of_connections_priority
+from code.heuristics.center_grid import get_priority_center_grid
 
-        not_solved_counter = 0
 
-        sorted_connections = []
+class Z_Up:
 
-        for connection in (sorted(self.gate_connections.values(), key=operator.attrgetter('priority'))):
-            sorted_connections.append(connection)
-
-        for sorted_connection in sorted_connections:
-            gate_a = sorted_connection.gate_a
-            gate_b = sorted_connection.gate_b
-
-            gate_a_coordinates = gate_a.coordinates
-            gate_b_coordinates = gate_b.coordinates
-
-            path = algorithms.astar(self.grid, gate_a_coordinates, gate_b_coordinates)
-            # print(path)
-
-        self.increased_level = False
-        if path == None and self.increased_level == False:
-            self.grid.increase_level()
-            self.increased_level = True
-            not_solved_counter += 1
-        if path == None and self.increased_level == True:
-            not_solved_counter += 1
+    def __init__(self, sorted_connections, grid, not_solved_counter):
+        self.sorted_connections = sorted_connections
+        self.grid = grid
         self.not_solved_counter = not_solved_counter
+
+    def solver(self, sorted_connections):
+
+        unsolved_dict = {}
+        i = 0
+
+        # Put unsolved connections in dict
+        for sorted_connection in sorted_connections.values():
+            path = astar(self.grid, sorted_connection)
+            if path == None:
+                unsolved_dict[i] = sorted_connection
+                self.not_solved_counter += 1
+                i += 1
+        return unsolved_dict
+
+    def run(self):
+
+        counter = 0
+        to_solve = self.sorted_connections
+        not_solved = self.solver(to_solve)
+        while not_solved != False:
+            self.grid.increase_level()
+            not_solved = self.solver(not_solved)
+            if counter > 1:
+                print("Oeps, out of bounds")
+                break
+            counter += 1
+        self.not_solved_counter = len(not_solved)

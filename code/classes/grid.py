@@ -409,6 +409,15 @@ class Grid:
                 goal_neighbor_correct_row.remove(goal_neighbor[0])
 
     def increase_level(self):
+
+        for connection in self.connections_list:
+            for coordinate in connection:
+                x = coordinate[0]
+                y = coordinate[1]
+                z = coordinate[2]
+
+                self.mother_grid[z][y].append(x) 
+
         # Select correct wires
         for connection in self.connections_list:
             if len(connection) > 4:
@@ -443,4 +452,11 @@ class Grid:
                         insert_wire = wire
                     connection[counter] = insert_wire
                     counter += 1
-            print(connection)
+
+        for connection in self.connections_list:
+            for coordinate in connection:
+                x = coordinate[0] 
+                y = coordinate[1]
+                z = coordinate[2]
+                if x in self.mother_grid[z][y]:
+                    self.mother_grid[z][y].remove(x)
