@@ -90,7 +90,6 @@ class Grid:
         self.gate_list = [empty_gate] * self.gate_count
 
         connections_per_gate = get_connections_per_gate(self.netlist)
-        print(connections_per_gate)
 
         for gate_data in self.temporary_gate_list:
             gate_nr = int(gate_data[0])
@@ -161,7 +160,6 @@ class Grid:
 
         if self.remove_neighbors == True:
             self.remove_gate_neighbors(connected_gates)
-            print("Joe joe")
 
         return self.mother_grid
 
@@ -185,7 +183,6 @@ class Grid:
 
                         all_gate_neighbors.append(neighbor)
                         gate.neighbors.append(neighbor)
-                        print(gate.neighbors)
 
             # Remove all neighbors from grid
             for gate_neighbor in all_gate_neighbors:
@@ -387,7 +384,6 @@ class Grid:
                     if x == goal_neighbor[0]:
                         neighbor_already_placed = True
                 if neighbor_already_placed == False:
-                    # print("Neighbor not yet placed")
                     goal_neighbor_correct_row.append(goal_neighbor[0])
                     self.mother_grid[goal_neighbor[2]][goal_neighbor[1]] = goal_neighbor_correct_row
 
