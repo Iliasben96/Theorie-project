@@ -23,10 +23,7 @@ class Z_Up:
             if path == None:
                 unsolved_dict[i] = sorted_connection
                 self.not_solved_counter += 1
-                # print(i)
                 i += 1
-                # print(sorted_connection.gate_a)
-                # print(sorted_connection.gate_b)
         return unsolved_dict
 
     def run(self):

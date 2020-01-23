@@ -1,6 +1,7 @@
 from code.classes.gate import Gate
 from code.classes.connection import Connection
 from code.heuristics.connection_amount import get_connections_per_gate
+from code.heuristics.neighbor_locker import NeighborLocker
 
 import csv
 import random
@@ -35,6 +36,10 @@ class Grid:
         self.grid_max_y = 0
 
         self.temporary_gate_list = []
+
+        self.connections_per_gate = {}
+
+        self.neighbor_locker = NeighborLocker(self)
 
         self.gate_count = self.read_chip_csv(chip_nr)
 
@@ -89,15 +94,15 @@ class Grid:
         empty_gate = Gate(0, (0, 0, 0), 0)
         self.gate_list = [empty_gate] * self.gate_count
 
-        connections_per_gate = get_connections_per_gate(self.netlist)
+        self.connections_per_gate = get_connections_per_gate(self.netlist)
 
         for gate_data in self.temporary_gate_list:
             gate_nr = int(gate_data[0])
             gate_x = int(gate_data[1])
             gate_y = int(gate_data[2])
             gate_connection_amount = 0
-            if gate_nr in connections_per_gate:
-                gate_connection_amount = connections_per_gate[gate_nr]
+            if gate_nr in self.connections_per_gate:
+                gate_connection_amount = self.connections_per_gate[gate_nr]
 
 
             gate_coordinates = (gate_x, gate_y, 0)
@@ -159,57 +164,62 @@ class Grid:
             correct_row.remove(gate_coordinates[0])
 
         if self.remove_neighbors == True:
-            self.remove_gate_neighbors(connected_gates)
+
+            self.neighbor_locker = NeighborLocker(self)
+            neighbors_to_remove = self.neighbor_locker.lock_gate_neighbors(self)
+
+            for neighbor in neighbors_to_remove:
+                neighbor_x = neighbor[0]
+                neighbor_y = neighbor[1]
+                neighbor_z = neighbor[2]
+
+                correct_row = self.mother_grid[neighbor_z][neighbor_y]
+                
+                if neighbor_x in correct_row:
+                    correct_row.remove(neighbor_x)
 
         return self.mother_grid
 
     """
-    Removes neighbors of every gate from the grid
+    Get neighbors of all gates
     """
-    def remove_gate_neighbors(self, connected_gates):
+    def get_gate_neighbors(self, position):
+        x = position[0]
+        y = position[1]
+        z = position[2]
 
-        all_gate_neighbors = []
+        neighbors = []
 
-        if self.remove_neighbors == True:
-            # For each gate that has a connection according to the netlist
-            for gate_nr in connected_gates:
+        # All possible moving positions
+        x_left = x - 1
+        x_right = x + 1
+        y_up = y + 1
+        y_down = y - 1
+        z_level_up = z + 1
 
-                gate = self.gate_list[gate_nr - 1]
-                # Get neighbors of this gate
-                neighbors = self.get_neighbors(gate.coordinates)
-                for neighbor in neighbors:
+        # Check if neigbors are legal, add legal ones to list of neighbors
 
-                    if neighbor not in all_gate_neighbors:
+        up_neighbor = (x, y_up, z)
+        if up_neighbor not in self.all_wires: 
+            neighbors.append(up_neighbor)
 
-                        all_gate_neighbors.append(neighbor)
-                        gate.neighbors.append(neighbor)
+        down_neighbor = (x, y_down, z)
+        if down_neighbor not in self.all_wires:
+            neighbors.append(down_neighbor)
 
-            # Remove all neighbors from grid
-            for gate_neighbor in all_gate_neighbors:
+        left_neighbor = (x_left, y, z)
+        if left_neighbor not in self.all_wires:
+            neighbors.append(left_neighbor)
 
-                base_grid = self.mother_grid[gate_neighbor[2]]
-                correct_row = base_grid[gate_neighbor[1]]
-                
-                for x in correct_row:
-                    if gate_neighbor[0] == x:
-                        correct_row.remove(gate_neighbor[0])
+        right_neighbor = (x_right, y, z)
+        if right_neighbor not in self.all_wires:
+            neighbors.append(right_neighbor)
 
+        level_up_neighbor = (x, y, z_level_up)
+        if level_up_neighbor not in self.all_wires:
+            neighbors.append(level_up_neighbor)
 
-    def make_connections(self):
-        id_counter = 0
-        for connection in self.netlist:
-
-            # Get gate numbers from netlist
-            gate_a_nr = connection[0]
-            gate_b_nr = connection[1]
-
-            # Get corresponding gates from gate_list
-            start_gate = self.gate_list[gate_a_nr - 1]
-            goal_gate = self.gate_list[gate_b_nr - 1]
-
-            new_connection = Connection(start_gate, goal_gate, id_counter)
-            self.gate_connections[id_counter] = new_connection
-            id_counter += 1
+        return(neighbors)
 
     """ 
     Function that returns all neighbors of a position
@@ -254,46 +264,21 @@ class Grid:
 
         return(neighbors)
 
-    """
-    Get neighbors of all gates
-    """
-    def get_gate_neighbors(self, position):
-        x = position[0]
-        y = position[1]
-        z = position[2]
+    def make_connections(self):
+        id_counter = 0
+        for connection in self.netlist:
 
-        neighbors = []
+            # Get gate numbers from netlist
+            gate_a_nr = connection[0]
+            gate_b_nr = connection[1]
 
-        # All possible moving positions
-        x_left = x - 1
-        x_right = x + 1
-        y_up = y + 1
-        y_down = y - 1
-        z_level_up = z + 1
+            # Get corresponding gates from gate_list
+            start_gate = self.gate_list[gate_a_nr - 1]
+            goal_gate = self.gate_list[gate_b_nr - 1]
 
-        # Check if neigbors are legal, add legal ones to list of neighbors
-
-        up_neighbor = (x, y_up, z)
-        if up_neighbor not in self.all_wires: 
-            neighbors.append(up_neighbor)
-
-        down_neighbor = (x, y_down, z)
-        if down_neighbor not in self.all_wires:
-            neighbors.append(down_neighbor)
-
-        left_neighbor = (x_left, y, z)
-        if left_neighbor not in self.all_wires:
-            neighbors.append(left_neighbor)
-
-        right_neighbor = (x_right, y, z)
-        if right_neighbor not in self.all_wires:
-            neighbors.append(right_neighbor)
-
-        level_up_neighbor = (x, y, z_level_up)
-        if level_up_neighbor not in self.all_wires:
-            neighbors.append(level_up_neighbor)
-
-        return(neighbors)
+            new_connection = Connection(start_gate, goal_gate, id_counter)
+            self.gate_connections[id_counter] = new_connection
+            id_counter += 1
 
     """
     Function that adds a set of wires, called connection, to a list of connections
@@ -332,85 +317,6 @@ class Grid:
         end_correct_row.append(goal_x)
 
         self.mother_grid[base_grid_index] = grid
-
-    """
-    Add back neighbors as walkable terrain
-    """
-    def add_back_gate_neighbors(self, start, goal):
-        start_neighbors = self.get_gate_neighbors(start)
-
-        found_wire = False
-
-        # Loop over neighbors of start point
-        for start_neighbor in start_neighbors:
-
-            # Check if the neighbor has a wire in its place
-            for wire in self.all_wires:
-                
-                if start_neighbor == wire:
-                    found_wire == True
-                    
-            neighbor_already_placed = False
-            
-            # Only add back the neighbor as walkable terrain if it is not a wire
-            if found_wire == False:
-                base_grid = self.mother_grid[start_neighbor[2]]
-                start_neighbor_correct_row = base_grid[start_neighbor[1]]
-                for x in start_neighbor_correct_row:
-                    
-                    if x == start_neighbor[0]:
-                        neighbor_already_placed = True
-                if neighbor_already_placed == False:
-                    start_neighbor_correct_row.append(start_neighbor[0])
-                    self.mother_grid[start_neighbor[2]][start_neighbor[1]] = start_neighbor_correct_row
-
-        goal_neighbors = self.get_gate_neighbors(goal)
-
-        found_wire = False
-
-        for goal_neighbor in goal_neighbors:
-
-            for wire in self.all_wires:
-
-                if goal_neighbor == wire:
-                    found_wire == True
-            
-            neighbor_already_placed = False
-                    
-            if found_wire == False:
-                base_grid = self.mother_grid[goal_neighbor[2]]
-                goal_neighbor_correct_row = base_grid[goal_neighbor[1]]
-                for x in goal_neighbor_correct_row:                    
-                    if x == goal_neighbor[0]:
-                        neighbor_already_placed = True
-                if neighbor_already_placed == False:
-                    goal_neighbor_correct_row.append(goal_neighbor[0])
-                    self.mother_grid[goal_neighbor[2]][goal_neighbor[1]] = goal_neighbor_correct_row
-
-    """
-    Relock the neighbors of the gate 
-    """
-    def relock_gate_neighbors(self, start, goal):
-
-        grid = {} 
-
-        # Lock neighbors to not be walkable anymore
-        start_neighbors = self.get_gate_neighbors(start)
-
-        for start_neighbor in start_neighbors:
-            grid = self.mother_grid[start_neighbor[2]]
-            start_neighbor_correct_row = grid[start_neighbor[1]]
-
-            if start_neighbor[0] in start_neighbor_correct_row:
-                start_neighbor_correct_row.remove(start_neighbor[0])
-
-        goal_neighbors = self.get_gate_neighbors(goal)
-
-        for goal_neighbor in goal_neighbors:
-            grid = self.mother_grid[goal_neighbor[2]]
-            goal_neighbor_correct_row = grid[goal_neighbor[1]]
-            if goal_neighbor[0] in goal_neighbor_correct_row:
-                goal_neighbor_correct_row.remove(goal_neighbor[0])
 
     def increase_level(self):
 

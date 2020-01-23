@@ -15,7 +15,7 @@ def astar(grid, connection):
     grid.add_start_end_gates(start_coordinates, goal_coordinates)
 
     if grid.remove_neighbors == True:
-        grid.add_back_gate_neighbors(start_coordinates, goal_coordinates)
+        grid.neighbor_locker.add_back_gate_neighbors(grid, start_gate, goal_gate)
 
     # Initialise the priority queue
     frontier = PriorityQueue()
@@ -50,6 +50,10 @@ def astar(grid, connection):
                 position = came_from[position] 
             grid.put_connection(path)      
             return path
+        
+        grid.neighbor_locker.check_if_neighbor(current, grid)
+
+        grid.neighbor_locker.lock_gate_neighbors(grid)
 
         # Get neighbors from grid
         neighbors = grid.get_neighbors(current)
@@ -76,4 +80,4 @@ def astar(grid, connection):
                 came_from[next_node] = current
 
     if grid.remove_neighbors == True:
-        grid.relock_gate_neighbors(start_coordinates, goal_coordinates)
+        grid.neighbor_locker.relock_gate_neighbors(grid, start_gate, goal_gate)
