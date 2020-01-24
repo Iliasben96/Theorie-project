@@ -1,15 +1,22 @@
 
 def get_amount_of_connections_priority(netlist, gate_connections):
 
+    # retrieves the connections per gate
     connections_per_gate = get_connections_per_gate(netlist)
     for gate_nr,n_connections in connections_per_gate.items():
 
+        # creates a priority based on connections
         priority = (6 - n_connections) / 2
+
+        # loops over all connections in netlist
         for connection_nr in gate_connections:
+
+            # gets the gates for the connection
             connection = gate_connections[connection_nr]
             gate_a = connection.gate_a
             gate_b = connection.gate_b
 
+            # assigns the priority to the connection
             if gate_nr == gate_a.nr or gate_nr == gate_b.nr:
                 connection.priority += priority
 

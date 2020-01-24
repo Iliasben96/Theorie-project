@@ -5,6 +5,9 @@ from code.heuristics.manhattan import manhattan_heuristic
 
 # Shortest path algorithm Astar 
 def astar(grid, connection):
+    """ A* algorithm to search for the shortest possible distance for a wire, using manhattan distance.
+    It uses heuristics to determine the order of the wires and to decide how to use neighbors.
+    """
 
     start_gate = connection.gate_a
     goal_gate = connection.gate_b

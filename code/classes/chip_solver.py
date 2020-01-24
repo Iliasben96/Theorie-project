@@ -8,7 +8,10 @@ from code.heuristics.z_up import Z_Up
 import operator
 
 class ChipSolver:  
-
+    """ Chipsolver creates a priority list, it calls A* to create the paths needed for that list.
+    User input is required to select the requested heuristic to run the loop.
+    """
+    
     def __init__(self, grid, netlist):
         self.grid = grid
         self.netlist = netlist
@@ -19,7 +22,9 @@ class ChipSolver:
         sorted_connections = {}
 
         counter = 0
+        # filters connections based on priority 
         for connection in (sorted(gate_connections.values(), key=operator.attrgetter('priority'))):
+            # assigns heighest priority first in the list
             sorted_connections[counter] = connection
             counter += 1
 
@@ -31,7 +36,7 @@ class ChipSolver:
 
         for sorted_connection in sorted_connections.values():
             path = astar(self.grid, sorted_connection)
-            # print(path)
+            # if A* can not place path +1 to the not_solved_counter
             if path == None:
                 not_solved_counter += 1
             self.not_solved_counter = not_solved_counter
@@ -39,27 +44,38 @@ class ChipSolver:
         return not_solved_counter
 
     def start(self, option):
+
+        # standard netlist order
         if option == 1:
             sorted_gate_connections = self.sort_connections(self.gate_connections)
             self.make_connections(sorted_gate_connections)
+
+        # calls the function to prioritse connections based on length
         if option == 2:
             prioritised_gate_connections = get_connection_length_priority(self.gate_connections)
             sorted_gate_connections = self.sort_connections(prioritised_gate_connections)
             self.make_connections(sorted_gate_connections)
+
+        # calls the random function, orders netlist in a random order
         if option == 3:
             prioritised_gate_connections = get_random_priority(self.gate_connections)
             sorted_gate_connections = self.sort_connections(prioritised_gate_connections)
             self.make_connections(sorted_gate_connections)
-        if option == 4:
 
+        # calls the connection amount function, which gives priority based on amount of connections
+        if option == 4:
             prioritised_gate_connections = get_amount_of_connections_priority(self.netlist, self.gate_connections)
             sorted_gate_connections = self.sort_connections(prioritised_gate_connections)
             self.make_connections(sorted_gate_connections)
             self.make_connections(prioritised_gate_connections)
+
+        # calls the priority_centergrid function, which orders chips based on their distance from the center of the grid
         if option == 5:
             prioritised_gate_connections = get_priority_center_grid(self.grid, self.gate_connections)
             sorted_gate_connections = self.sort_connections(prioritised_gate_connections)
             self.make_connections(sorted_gate_connections)
+
+        # uses the 
         if option == 7:
             prioritised_gate_connections = get_amount_of_connections_priority(self.netlist, self.gate_connections)
             sorted_gate_connections = self.sort_connections(prioritised_gate_connections)
