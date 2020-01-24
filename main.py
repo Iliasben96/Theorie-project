@@ -6,7 +6,7 @@ from code.classes.chip_solver import ChipSolver
 from code.algorithms.random_loop import start_random_solutions
 
 if __name__ == "__main__":
-
+    
     chip_nr = input("Please choose the chip number: (1 or 2) ")
 
     while chip_nr.isdigit() == False:
@@ -76,15 +76,13 @@ if __name__ == "__main__":
             print("no solution found")
 
     else:
-        # # Make new grid instance
+        # Make new grid instance
         grid = Grid(chip_nr, netlist, neighbor_lock)
-
         chip_solver = ChipSolver(grid, netlist)
-
         chip_solver.start(heuristic_nr)
-
         total_connections = len(netlist)
 
+        # solution information
         print("Wires not solved %d " % (chip_solver.not_solved_counter))
         print("Wires solved %d" % (total_connections - chip_solver.not_solved_counter))
         print("Wires used: %d" % (grid.wire_count))
@@ -92,5 +90,6 @@ if __name__ == "__main__":
         print("Wires per succesfull connection")
         print(wires_per_connection)
 
+        # generates visual plot
         chip_plot = Plot(grid)
         chip_plot.plot()

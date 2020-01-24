@@ -21,7 +21,8 @@ class Plot:
         grid = self.grid
 
         gate_list = grid.gate_list
-
+        
+        # Adds the gates to the list of coordinates
         for gate in gate_list:
             gate_numbers.append(gate.nr)
             gates_x.append(gate.coordinates[0])
@@ -39,10 +40,12 @@ class Plot:
 
         for connection in connections:
 
+            # Creation of list of wire coordinates
             wire_x = []
             wire_y = []
             wire_z = []
 
+            # Adds wire to the wire coordinates list
             for wire in connection:
                 wire_x.append(wire[0])
                 wire_y.append(wire[1])
