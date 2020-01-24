@@ -2,6 +2,8 @@ import math
 from code.classes.grid import Grid
 from code.classes.priority_queue import PriorityQueue
 from code.heuristics.manhattan import manhattan_heuristic
+from code.heuristics.neighbor_locker import NeighborLocker
+from code.classes.state import State
 
 # Shortest path algorithm Astar 
 def astar(grid, connection):
@@ -33,30 +35,66 @@ def astar(grid, connection):
     came_from[start_coordinates] = None
     cost_so_far[start_coordinates] = 0
 
+    grid_of_path = {}
+    
+    temp_grid = grid
+
+    gate_list = temp_grid.gate_list
+
+    neighbor_locker = NeighborLocker(temp_grid, gate_list)
+
+    gate_connections_dict = neighbor_locker.make_gate_connections_dict(gate_list)
+
+    state = State(start_coordinates, gate_connections_dict, neighbor_locker.closed_neighbors, temp_grid)
+
     # Explore map untill queue is empty
     while not frontier.empty():
 
         # Get first item in priority queue
         current = frontier.get()
 
+        if current in grid_of_path:
+            state = grid_of_path[current]
+        else:
+            if came_from[current] in grid_of_path:
+                state = grid_of_path[came_from[current]]
+                print("Current node:" )
+                print(current)
+                print("I came from")
+                print(came_from[current])
+            elif came_from[current] == None:
+                print("I am the start node")
+                print(current)
+
+        # TODO: Use this later
+        
+        new_gate_list = neighbor_locker.check_if_neighbor(current, state.grid, state.gate_list)
+
+        closed_list = neighbor_locker.lock_gate_neighbors(state.grid, state.gate_list)
+
+        new_state = State(current, new_gate_list, closed_list, temp_grid)
+
+        grid_of_path[current] = new_state
+
+        print(state)
+        print(new_state)
+
         # Stop if you reach goal
         if current == goal_coordinates:
-            # print("Found goal")
             path = []
             position = current
             while position != came_from[start_coordinates]:
                 path.append(position)
                 grid.all_wires.append(position)
                 position = came_from[position] 
-            grid.put_connection(path)      
+            grid.put_connection(path)     
+            start_gate.connection_amount -= 1
+            goal_gate.connection_amount -= 1
+            print(grid.neighbor_locker.closed_neighbors)
             return path
-        
-        grid.neighbor_locker.check_if_neighbor(current, grid)
-
-        grid.neighbor_locker.lock_gate_neighbors(grid)
 
         # Get neighbors from grid
-        neighbors = grid.get_neighbors(current)
+        neighbors = temp_grid.get_neighbors(current)
         
         # Loop over neighbors of current node
         for next_node in neighbors:

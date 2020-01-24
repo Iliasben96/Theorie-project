@@ -39,8 +39,6 @@ class Grid:
 
         self.connections_per_gate = {}
 
-        self.neighbor_locker = NeighborLocker(self)
-
         self.gate_count = self.read_chip_csv(chip_nr)
 
         self.get_start_grid(chip_nr)
@@ -165,8 +163,9 @@ class Grid:
 
         if self.remove_neighbors == True:
 
-            self.neighbor_locker = NeighborLocker(self)
-            neighbors_to_remove = self.neighbor_locker.lock_gate_neighbors(self)
+            self.neighbor_locker = NeighborLocker(self, self.gate_list)
+            connections_dict = self.neighbor_locker.make_gate_connections_dict
+            neighbors_to_remove = self.neighbor_locker.lock_gate_neighbors(self, connections_dict)
 
             for neighbor in neighbors_to_remove:
                 neighbor_x = neighbor[0]
