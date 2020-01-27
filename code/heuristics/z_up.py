@@ -12,14 +12,14 @@ class Z_Up:
         self.grid = grid
         self.not_solved_counter = not_solved_counter
 
-    def solver(self, sorted_connections):
+    def solver(self, neighbor_option, sorted_connections):
         astar = Astar()
         unsolved_dict = {}
         i = 0
 
         # runs A* for every connection
         for sorted_connection in sorted_connections.values():
-            path = astar.astar(self.grid, sorted_connection)
+            path = astar.start(neighbor_option, self.grid, sorted_connection)
             
             # if no connection can be found places the connection in the unsolved dictionary
             if path == None:
@@ -29,16 +29,16 @@ class Z_Up:
 
         return unsolved_dict
 
-    def run(self):
+    def run(self, neighbor_option):
 
         counter = 0
         to_solve = self.sorted_connections
-        not_solved = self.solver(to_solve)
+        not_solved = self.solver(neighbor_option, to_solve)
         # keeps running until there are no unresolved connections
         while not_solved != False:
 
             # raise level function can only be used once
-            if counter > 1:
+            if counter > 2:
                 print("Oeps, out of bounds")
                 break
 
@@ -46,7 +46,7 @@ class Z_Up:
             self.grid.increase_level()
 
             # tries to solve the unsolved connections after raising the level
-            not_solved = self.solver(not_solved)
+            not_solved = self.solver(neighbor_option, not_solved)
             counter += 1
         
         self.not_solved_counter = len(not_solved)

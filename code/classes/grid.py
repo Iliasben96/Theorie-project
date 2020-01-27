@@ -6,7 +6,6 @@ import csv
 import random
 
 class Grid: 
-    counter = 0
 
     def __init__(self, chip_nr, netlist, remove_neighbors):
         self.chip_nr = chip_nr
@@ -31,8 +30,10 @@ class Grid:
         # List with all coordinates used by wires
         self.all_wires = []
 
+        # Dictionary that has the coordinates of a neighbor of a gate as key, and the gate numbers that have this neighbor as values
         self.neighbors_gates_link = {}
 
+        # List with tuples containing the coordinates of all neighbors of all gates
         self.all_gate_neighbors = []
 
         self.grid_max_x = 0
@@ -40,22 +41,26 @@ class Grid:
 
         self.temporary_gate_list = []
 
+        # Get a dictionary with the amount of connections for each gate, according to the provided netlist
         self.connections_per_gate = get_connections_per_gate(self.netlist)
 
+        # Get the amount of gates from the chip_csv file
         self.gate_count = self.read_chip_csv(chip_nr)
 
+        # Init the initial startgrid
         self.get_start_grid(chip_nr)
 
+        # Generate a list with connection objects
         self.make_connections()
 
+        # Counter to keep track of amount of wires used
         self.wire_count = 0
 
-        Grid.counter += 1
 
-    """
-    function to calculate how many gates a print list has
-    """
     def read_chip_csv(self, chip_nr):
+        """ 
+        Function to calculate how many gates a print list has.
+        """
         counter = 0
 
         first_row = True
@@ -66,6 +71,7 @@ class Grid:
         # open CSV file
         with open(path, newline='') as gatesfile:
             filereader = csv.reader(gatesfile, delimiter=' ', quotechar = '|')
+
             # Loop over csv rows
             for row in filereader:
 
@@ -82,10 +88,11 @@ class Grid:
 
         return counter          
 
-    """
-    Create the start grid according to a chip_nr with a set amount of gates
-    """
     def get_start_grid(self, chip_nr):
+
+        """
+        Create the start grid according to a chip_nr with a set amount of gates
+        """
 
         # Lists to later figure out the maximum coordinates of a gate
         all_x = []
@@ -95,6 +102,8 @@ class Grid:
         empty_gate = Gate(0, (0, 0, 0), 0)
         self.gate_list = [empty_gate] * self.gate_count
 
+
+        # Make the temporary gate list into the final gatelist
         for gate_data in self.temporary_gate_list:
             gate_nr = int(gate_data[0])
             gate_x = int(gate_data[1])
@@ -112,6 +121,8 @@ class Grid:
 
             # Create new gate object and add it to the list of gates
             new_gate = Gate(gate_nr, gate_coordinates, gate_connection_amount)
+
+            # Gatelist that stores all gates
             self.gate_list[gate_nr - 1] = new_gate
 
         # Calculate max_x and max_y to create grids
@@ -124,8 +135,6 @@ class Grid:
 
         grid_max_x = max_x + padding_x
         grid_max_y = max_y + padding_y
-
-        self.grid_max_y = grid_max_y
 
         self.grid_max_x = grid_max_x
         self.grid_max_y = grid_max_y
@@ -147,6 +156,8 @@ class Grid:
 
         connected_gates = []
 
+
+
         # Loop over all connections in gate list
         for gate in self.gate_list:
             # Check if the gate is in the netlist
@@ -156,16 +167,21 @@ class Grid:
                     # If it is, add the nummber to a new list
                     connected_gates.append(gate.nr)
 
-            # Remove coordinates of gates from grid
+            # Remove coordinates of gates from grid, so that Astar can't use it to make a path later
             gate_coordinates = gate.coordinates
+
             self.remove_coordinate(gate_coordinates)
 
+        self.get_all_gate_neighbor_list(connected_gates)
         if self.remove_neighbors == True:
-            self.remove_gate_neighbors(connected_gates)
+            self.remove_gate_neighbors()
 
         return self.mother_grid
 
     def place_coordinate(self, coordinates):
+        """
+        Places a coordinate in the grid
+        """
 
         row_to_place = self.mother_grid[coordinates[2]][coordinates[1]]
         
@@ -176,6 +192,9 @@ class Grid:
         return False
 
     def remove_coordinate(self, coordinates):
+        """
+        Removes a coordinate from the grid
+        """
         row_to_remove = self.mother_grid[coordinates[2]][coordinates[1]]
 
         if coordinates[0] in row_to_remove:
@@ -183,36 +202,43 @@ class Grid:
             return True
         return False
 
-    """
-    Removes neighbors of every gate from the grid
-    """
-    def remove_gate_neighbors(self, connected_gates):
 
-        if self.remove_neighbors == True:
-            # For each gate that has a connection according to the netlist
-            for gate_nr in connected_gates:
+    def get_all_gate_neighbor_list(self, connected_gates):
 
-                gate = self.gate_list[gate_nr - 1]
-                # Get neighbors of this gate
-                neighbors = self.get_gate_neighbors(gate.coordinates)
-                for neighbor in neighbors:
+        # For each gate that has a connection according to the netlist
+        for gate_nr in connected_gates:
 
-                    if neighbor not in self.neighbors_gates_link:
-                        self.neighbors_gates_link[neighbor] = [gate_nr]
-                    else:
-                        self.neighbors_gates_link[neighbor].append(gate_nr)
+            gate = self.gate_list[gate_nr - 1]
+            # Get neighbors of this gate
+            neighbors = self.get_gate_neighbors(gate.coordinates)
+            for neighbor in neighbors:
 
-                    if neighbor not in self.all_gate_neighbors:
+                if neighbor not in self.neighbors_gates_link:
+                    self.neighbors_gates_link[neighbor] = [gate_nr]
+                else:
+                    self.neighbors_gates_link[neighbor].append(gate_nr)
 
-                        self.all_gate_neighbors.append(neighbor)
-                        gate.neighbors.append(neighbor)
+                if neighbor not in self.all_gate_neighbors:
 
-            # Remove all neighbors from grid
-            for gate_neighbor in self.all_gate_neighbors:
+                    self.all_gate_neighbors.append(neighbor)
+                    gate.neighbors.append(neighbor)
 
-                self.remove_coordinate(gate_neighbor)
+
+
+    def remove_gate_neighbors(self):
+
+        """
+        Removes neighbors of every gate from the grid
+        """
+        for gate_neighbor in self.all_gate_neighbors:
+
+            self.remove_coordinate(gate_neighbor)
 
     def make_connections(self):
+        """
+        Makes all connections in netlist into connection objects and stores them in a dictionary
+        """
+
         id_counter = 0
         for connection in self.netlist:
 
@@ -228,11 +254,11 @@ class Grid:
             self.gate_connections[id_counter] = new_connection
             id_counter += 1
 
-      
-    """
-    Function that adds a set of wires, called connection, to a list of connections
-    """
+
     def put_connection(self, connection):
+        """
+        Function takes a connection or path (usually from Astar) and removes the coordinates of each step from grid
+        """
         for wire in connection:
 
             self.remove_coordinate(wire)
@@ -242,10 +268,11 @@ class Grid:
 
         self.connections_list.append(connection)
 
-    """ 
-    Function that returns all neighbors of a position
-    """
+
     def get_neighbors(self, position):
+        """ 
+        Function that returns all neighbor coordinates of a position
+        """
 
         x = position[0]
         y = position[1]
@@ -285,10 +312,11 @@ class Grid:
 
         return(neighbors)
 
-    """
-    Get neighbors of all gates
-    """
+
     def get_gate_neighbors(self, position):
+        """
+        Get neighbor coordinates of all gates
+        """
         x = position[0]
         y = position[1]
         z = position[2]
@@ -303,7 +331,6 @@ class Grid:
         z_level_up = z + 1
 
         # Check if neigbors are legal, add legal ones to list of neighbors
-
         up_neighbor = (x, y_up, z)
         if up_neighbor not in self.all_wires: 
             neighbors.append(up_neighbor)
@@ -326,18 +353,18 @@ class Grid:
 
         return(neighbors)
 
-
-    """
-    Add start and end gates as walkable terrain when they are being used
-    """
     def add_start_end_gates(self, start, goal):
+        """
+        Add start and end gates as walkable terrain when they are being used
+        """
         self.place_coordinate(start)
         self.place_coordinate(goal)
 
-    """
-    Add back neighbors as walkable terrain
-    """
+
     def add_back_gate_neighbors(self, start, goal):
+        """
+        Add back neighbors as walkable terrain
+        """
         start_neighbors = self.get_gate_neighbors(start)
 
         found_wire = False
@@ -370,10 +397,10 @@ class Grid:
             if found_wire == False:
                 self.place_coordinate(goal_neighbor)
 
-    """
-    Relock the neighbors of the gate 
-    """
     def relock_gate_neighbors(self, start, goal):
+        """
+        Relock the neighbors of the gate 
+        """
 
         # Lock neighbors to not be walkable anymore
         start_neighbors = self.get_gate_neighbors(start)
@@ -388,11 +415,20 @@ class Grid:
 
     def increase_level(self):
 
+        """
+        Function that increases level of all current connections
+        """
+
+
+        # Place back connections that were removed as walkable due to Astar
         for connection in self.connections_list:
             for coordinate in connection:
                 self.place_coordinate(coordinate)
 
-        # Select correct wires
+        """
+        Select correct wires, only wires that have a length more than 4 get their z incremented, 
+        as otherwise it does not free up space in a grid where only manhattan moves are allowed.
+        """
         for connection in self.connections_list:
             if len(connection) > 4:
                 second_wire = connection[1]
@@ -427,6 +463,7 @@ class Grid:
                     connection[counter] = insert_wire
                     counter += 1
 
+        # Remove all coordinates from new connections from the grid, so Astar can't walk there anymore
         for connection in self.connections_list:
             for coordinate in connection:
                 self.remove_coordinate(coordinate)

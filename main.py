@@ -50,13 +50,18 @@ if __name__ == "__main__":
     while heuristic_nr < 0 or netlist_nr > 7:
         netlist_nr = input("Error: please choose heuristic number (1 through 7): ")
 
-    neighbor_lock_input = input("Do you want to enable gate locking? (yes/no) ")
+    neighbor_lock_input = input("What kind of neighbor locking would you like to enable? \n " + 
+    "1: No locking 2: Lock everything before running 3: Lock dynamically during runtime (1, 2 or 3) ")
 
-    while neighbor_lock_input != "yes" and neighbor_lock_input != "no":
-        neighbor_lock_input = input("Error: please provide proper input (yes/no) ")
-    
+    while neighbor_lock_input.isdigit() == False:
+        neighbor_lock_input = input("Error: please a valid option (1, 2, or 3): ")
+        
+    neighbor_lock_input = int(neighbor_lock_input)
+    while neighbor_lock_input < 0 or neighbor_lock_input > 3:
+        neighbor_lock_input = input("Error: please choose a valid option (1, 2, or 3): ")
+
     neighbor_lock = False
-    if neighbor_lock_input == "yes":
+    if neighbor_lock_input == 2:
         neighbor_lock = True
 
 
@@ -79,7 +84,7 @@ if __name__ == "__main__":
         # Make new grid instance
         grid = Grid(chip_nr, netlist, neighbor_lock)
         chip_solver = ChipSolver(grid, netlist)
-        chip_solver.start(heuristic_nr)
+        chip_solver.start(heuristic_nr, neighbor_lock_input)
         total_connections = len(netlist)
 
         # solution information

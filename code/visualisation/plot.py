@@ -63,8 +63,8 @@ class Plot:
             ax.text(x, y, z + 0.2, gate, fontsize=9)    
 
         # Set limits an labels
-        ax.set_xlim(0, grid.grid_max_x)
-        ax.set_ylim(0, grid.grid_max_y)
+        ax.set_xlim(0, grid.grid_max_x - 1)
+        ax.set_ylim(0, grid.grid_max_y - 1)
         ax.set_zlim(0, 6)
         ax.set_xlabel('X axis')
         ax.set_ylabel('Y axis')

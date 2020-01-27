@@ -57,7 +57,6 @@ class NeighborLocker:
 
                 # Check if the gate has an open spot in available gate neigbors
                 if gate_nr in available_neighbors and available_neighbors[gate_nr] > 0:
-                        print("Coordinate is neighbor of gate %d, one is deducted from it's free spots" % (gate_nr))
 
                         # If it has an available spot, 
                         temp = available_neighbors[gate_nr]
@@ -69,13 +68,10 @@ class NeighborLocker:
     def lock_double_neighbors(self, locked_neighbors, all_gate_neighbors, available_neighbors):
 
         for locked_neighbor in locked_neighbors:
-            neighbors_to_check =  all_gate_neighbors[locked_neighbor]
+            neighbors_to_check = all_gate_neighbors[locked_neighbor]
 
             for gate_nr in neighbors_to_check:
                 if gate_nr in available_neighbors and available_neighbors[gate_nr] > 0:
-                    print("Neighbor")
-                    print(locked_neighbor)
-                    print("Caused gate_nr %d to lock" % (gate_nr))
                     temp = available_neighbors[gate_nr]
                     temp -= 1
                     available_neighbors[gate_nr] = temp
