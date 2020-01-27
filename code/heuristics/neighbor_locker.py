@@ -41,5 +41,43 @@ class NeighborLocker:
                         if neighbor not in locked_neighbors:
                             # Lock it
                             locked_neighbors[neighbor] = gate_nr
+
         # Return all the neighbors that have been locked
-        return locked_neighbors      
+        return locked_neighbors     
+
+    def get_new_available_neighbors(self, position, all_gate_neighbors, locked_neighbors, available_neighbors):
+
+        # If the current is a neighbor of a gate, and not locked
+        if position in all_gate_neighbors and position not in locked_neighbors:
+
+            neighbors_to_check = all_gate_neighbors[position]
+
+            # Loop over list of gates that have this neighbor
+            for gate_nr in neighbors_to_check:
+
+                # Check if the gate has an open spot in available gate neigbors
+                if gate_nr in available_neighbors and available_neighbors[gate_nr] > 0:
+                        print("Coordinate is neighbor of gate %d, one is deducted from it's free spots" % (gate_nr))
+
+                        # If it has an available spot, 
+                        temp = available_neighbors[gate_nr]
+                        temp -= 1
+                        available_neighbors[gate_nr] = temp
+
+        return available_neighbors
+
+    def lock_double_neighbors(self, locked_neighbors, all_gate_neighbors, available_neighbors):
+
+        for locked_neighbor in locked_neighbors:
+            neighbors_to_check =  all_gate_neighbors[locked_neighbor]
+
+            for gate_nr in neighbors_to_check:
+                if gate_nr in available_neighbors and available_neighbors[gate_nr] > 0:
+                    print("Neighbor")
+                    print(locked_neighbor)
+                    print("Caused gate_nr %d to lock" % (gate_nr))
+                    temp = available_neighbors[gate_nr]
+                    temp -= 1
+                    available_neighbors[gate_nr] = temp
+
+        return available_neighbors

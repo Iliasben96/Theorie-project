@@ -1,4 +1,4 @@
-from code.algorithms.astar import astar
+from code.algorithms.astar import Astar
 from code.heuristics.connection_length import get_connection_length_priority
 from code.heuristics.random_priority import get_random_priority
 from code.heuristics.connection_amount import get_amount_of_connections_priority
@@ -13,13 +13,13 @@ class Z_Up:
         self.not_solved_counter = not_solved_counter
 
     def solver(self, sorted_connections):
-
+        astar = Astar()
         unsolved_dict = {}
         i = 0
 
         # runs A* for every connection
         for sorted_connection in sorted_connections.values():
-            path = astar(self.grid, sorted_connection)
+            path = astar.astar(self.grid, sorted_connection)
             
             # if no connection can be found places the connection in the unsolved dictionary
             if path == None:

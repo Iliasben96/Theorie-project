@@ -1,4 +1,4 @@
-from code.algorithms.astar import astar
+from code.algorithms.astar import Astar
 from code.heuristics.connection_length import get_connection_length_priority
 from code.heuristics.random_priority import get_random_priority
 from code.heuristics.connection_amount import get_amount_of_connections_priority
@@ -32,10 +32,11 @@ class ChipSolver:
 
     def make_connections(self, sorted_connections):
 
+        astar = Astar()
         not_solved_counter = 0
 
         for sorted_connection in sorted_connections.values():
-            path = astar(self.grid, sorted_connection)
+            path = astar.astar(self.grid, sorted_connection)
             # if A* can not place path +1 to the not_solved_counter
             if path == None:
                 not_solved_counter += 1
