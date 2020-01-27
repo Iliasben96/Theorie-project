@@ -7,44 +7,39 @@ class NeighborLocker:
         self.connections_per_gate = grid.connections_per_gate
         self.neighbor_gate_link = grid.neighbors_gates_link
 
+    # Make a list of gate numbers with the amount of connections after them
     def get_available_neighbors_dict(self):
-        
         available_neighbors_amounts = {}
         for gate,connection_amount in self.connections_per_gate.items():
             available_neighbors_amounts[gate] = 5 - connection_amount
-        
-        print(available_neighbors_amounts)
         return available_neighbors_amounts
 
     def get_all_gate_neighbors(self):
-        print(self.neighbor_gate_link)
+        return self.neighbor_gate_link
 
-    def lock_neighbors(self, available_neighbors_amounts):
+    # Loops over the available neighbors dict and returns what neighbors should be locked because of this
+    def lock_neighbors(self, available_neighbors_amounts, locked_neighbors, start_gate_nr, goal_gate_nr):
 
-        hard_lock = {}
         for gate_nr,available_neighbor_amount in available_neighbors_amounts.items():
-            if available_neighbor_amount == 0:
-                gate = self.grid.gate_list[gate_nr - 1]
-                neighbors_to_lock = self.grid.get_gate_neighbors(gate.coordinates)
-                for neighbor in neighbors_to_lock:
-                    hard_lock[neighbor] = gate_nr
-        print(hard_lock)
 
+            # Make sure not to include the goal and end, so their neighbors can be used
+            if gate_nr != start_gate_nr and gate_nr != goal_gate_nr:
 
-    # Astar runt
-    # Als je al bestaat, pak die state opnieuw
-    # Zo niet
-        # Pak de state van de vorige coordinaat
-            # Als er geen vorige coordinaat is, kies begin state (Standaard grid, connections amount etc.)
+                # Only lock if a certain gate has no more free connections, provided how many connections they need and how many neighbors have been used up
+                if available_neighbor_amount == 0:
 
-    # Lock alle neighbors van alle gates die in de available neighbors amount (opgehaald uit state) op 0 staan
-    # Unlock goal en start gates
-    # Unlock alle neighbors van start en goal uit hard_lock (opgehaald uit state)
-    # Ga een kant op
-    # Check of dit nieuwe coordinaat een neighbor is, in neighbor gate link 
-        # Zo ja, haal 1 af van de availible neighbors amount dict voor elke gate die deze neighbor bezit
-        # Sla grid, coordinaat, available neighbors en hard_locks op in een state
-        # Zo nee, doe niks
-                
+                    # Seek the right gate from the gate list
+                    gate = self.grid.gate_list[gate_nr - 1]
 
-        
+                    # Get the coordinates of this gate
+                    neighbors_to_lock = self.grid.get_gate_neighbors(gate.coordinates)
+
+                    # Loop over all the neighbors
+                    for neighbor in neighbors_to_lock:
+
+                        # If it hasn't been locked
+                        if neighbor not in locked_neighbors:
+                            # Lock it
+                            locked_neighbors[neighbor] = gate_nr
+        # Return all the neighbors that have been locked
+        return locked_neighbors      
