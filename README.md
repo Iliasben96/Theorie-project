@@ -25,44 +25,44 @@
 <p> Here are all the important maps and files in the project</p>
 <ul>
     <li><strong>/code</strong>
-        ": Contains all code of the project"
+        : Contains all code of the project
     </li>
     <ul>
         <li><strong>/code/algorithms</strong>
-            ": contains all algortihms"
+            : contains all algortihms
         </li>
         <li><strong>/code/classes</strong>
-            ": contains all classes and helper functions"
+            : contains all classes and helper functions
         </li>
         <li><strong>/code/heuristics</strong>
-            ": contains all heuristics"
+            : contains all heuristics
         </li>
         <li><strong>/code/user_interface</strong>
-            ": contains all files for user interface"
+            : contains all files for user interface
         </li>
         <li><strong>/code/visualisation</strong>
-            ": contains all code required for the visualitsation"
+            : contains all code required for the visualitsation
         </li>
     </ul>
 </ul>
 <ul>
     <li><strong>/data</strong>
-        ": Contains all data of the plot"
+        : Contains all data of the plot
     </li>
     <ul>
         <li><strong>/data/gates&netlists</strong>
-            ": contains the files needed to generate the plots"
+            : contains the files needed to generate the plots
         </li>
         <ul>
             <li><strong>/data/gates&netlists/chip_1</strong>
-            ": contains all files involving chip 1."
+            : contains all files involving chip 1
             </li>
             <li><strong>/data/gates&netlists/chip_2</strong>
-            ": contains all files involving chip 2."
+            : contains all files involving chip 2
             </li>
         </ul>
         <li><strong>/data/results</strong>
-            ": contains a result csv file as output from the code"
+            : contains a result csv file as output from the code
         </li>
     </ul>
 </ul>
