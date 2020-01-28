@@ -2,10 +2,10 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-from code.classes.grid import Grid
-
 
 class Plot:
+    """Visualisation of the connections between the gates, according to the gate list, on the grid
+    """
 
     def __init__(self, grid):
         self.grid = grid
@@ -82,7 +82,5 @@ class Plot:
         colors = [colormap(i) for i in np.linspace(0, 1,len(ax.lines))]
         for i,j in enumerate(ax.lines):
             j.set_color(colors[i])
-
-        # ax.legend(loc=2)
 
         plt.show()

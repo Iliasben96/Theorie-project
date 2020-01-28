@@ -1,6 +1,7 @@
 import random
 
 def get_random_priority(gate_connections):
+    """Get random priority for each connection"""
 
     connection_numbers = []
 

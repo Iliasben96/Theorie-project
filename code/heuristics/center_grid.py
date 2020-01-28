@@ -1,8 +1,8 @@
 from code.classes.grid import Grid
 from code.heuristics.manhattan import manhattan_heuristic
 
-# Rebuild all functions to return priority instead of priority queue
 def get_priority_center_grid(grid, gate_connections):
+    """Gets priority depending on how close the gates in a connection are to the centre """
 
     # calculates grid center
     centre_x = abs(grid.grid_max_x / 2)

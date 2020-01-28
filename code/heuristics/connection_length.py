@@ -1,6 +1,8 @@
 from code.heuristics.manhattan import manhattan_heuristic
 
 def get_connection_length_priority(gate_connections):
+    """Get the priority based on manhatten distance between the two gates"""
+
 
     # loops over all connections in the netlist
     for connection_nr in gate_connections:

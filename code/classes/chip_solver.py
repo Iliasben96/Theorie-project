@@ -5,13 +5,14 @@ from code.heuristics.connection_amount import get_amount_of_connections_priority
 from code.heuristics.center_grid import get_priority_center_grid
 from code.heuristics.z_up import Z_Up
 from code.algorithms.random_loop import start_random_solutions
-from code.classes.table_creator import table_creator
+from code.classes.results_csv_generator import generate_results_csv
 
 import operator
 
 class ChipSolver:  
-    """ Chipsolver creates a priority list, it calls A* to create the paths needed for that list.
-    User input is required to select the requested heuristic to run the loop.
+    """ Chipsolver creates a priority list for all connections from the netlist, 
+    it calls A* to find the shortest path for each connection.
+    User input is required to select a what heuristic to apply and what option to pick for neighborlocking
     """
     
     def __init__(self, grid, netlist):
@@ -21,24 +22,31 @@ class ChipSolver:
         self.gate_connections = grid.gate_connections
 
     def sort_connections(self, gate_connections):
-        sorted_connections = {}
+        """Sorts inputted gate_connections, based on the priority value of each connection"""
 
-        counter = 0
+        sorted_connections = {}
+        priority = 0
+
         # filters connections based on priority 
         for connection in (sorted(gate_connections.values(), key=operator.attrgetter('priority'))):
             # assigns heighest priority first in the list
-            sorted_connections[counter] = connection
-            counter += 1
+            sorted_connections[priority] = connection
+            priority += 1
 
         return sorted_connections
 
     def run(self, sorted_connections, neighbor_lock_nr):
+        """Run Astar in the order of the sorted_connections, with the correct neighbor_lock_nr"""
 
         astar = Astar()
         not_solved_counter = 0
 
+        # Loop over sorted connections
         for sorted_connection in sorted_connections.values():
+
+            # Get a path from Astar algorithm
             path = astar.start(neighbor_lock_nr, self.grid, sorted_connection)
+            
             # if A* can not place path +1 to the not_solved_counter
             if path == None:
                 not_solved_counter += 1
@@ -46,39 +54,39 @@ class ChipSolver:
 
         return not_solved_counter
 
-    def start(self, option, neighbor_option):
+    def start(self, heuristic_nr, neighbor_lock_nr, z_up_option):
+        """Start solving the chip with a heuristic number"""
 
-        # standard netlist order
-        if option == 1:
+        sorted_gate_connections = {}
+
+        # Sandard netlist order
+        if heuristic_nr == 1:
             sorted_gate_connections = self.sort_connections(self.gate_connections)
-            self.run(sorted_gate_connections, neighbor_option)
 
-        # calls the function to prioritse connections based on length
-        if option == 2:
+
+        # Connections with shorter length have priority
+        if heuristic_nr == 2:
             prioritised_gate_connections = get_connection_length_priority(self.gate_connections)
             sorted_gate_connections = self.sort_connections(prioritised_gate_connections)
-            self.run(sorted_gate_connections, neighbor_option)
 
-        # calls the random function, orders netlist in a random order
-        if option == 3:
+        # Netlist is ordered in a random fashion
+        if heuristic_nr == 3:
             prioritised_gate_connections = get_random_priority(self.gate_connections)
             sorted_gate_connections = self.sort_connections(prioritised_gate_connections)
-            self.run(sorted_gate_connections, neighbor_option)
 
-        # calls the connection amount function, which gives priority based on amount of connections
-        if option == 4:
+
+        # Netlist is ordered by the amount of connections, gates with most connections have priority
+        if heuristic_nr == 4:
             prioritised_gate_connections = get_amount_of_connections_priority(self.netlist, self.gate_connections)
             sorted_gate_connections = self.sort_connections(prioritised_gate_connections)
-            self.run(sorted_gate_connections, neighbor_option)
-            self.run(prioritised_gate_connections, neighbor_option)
 
-        # calls the priority_centergrid function, which orders chips based on their distance from the center of the grid
-        if option == 5:
+        # Netlist is ordered based on what connections are shortest
+        if heuristic_nr == 5:
             prioritised_gate_connections = get_priority_center_grid(self.grid, self.gate_connections)
             sorted_gate_connections = self.sort_connections(prioritised_gate_connections)
-            self.run(sorted_gate_connections, neighbor_option)
 
-        if option == 6:
+        # Try an amount of random netlist orders
+        if heuristic_nr == 6:
             iterations = input("How many iterations do you want to try: ")
             while iterations.isdigit() == False:
                 iterations = input("Error: please provide a number higher than zero: ")
@@ -91,13 +99,12 @@ class ChipSolver:
             if solved == False:
                 print("no solution found")
             else: 
-                table_creator(self.grid, self.netlist)
+                generate_results_csv(self.grid, self.netlist)
 
-
-        # uses the 
-        if option == 7:
-            prioritised_gate_connections = get_amount_of_connections_priority(self.netlist, self.gate_connections)
-            sorted_gate_connections = self.sort_connections(prioritised_gate_connections)
+        # Select the z_up_option based on user input
+        if z_up_option == True:
             z_up = Z_Up(sorted_gate_connections, self.grid, self.not_solved_counter)
-            z_up.run(self.grid, neighbor_option)
+            z_up.run(self.grid, neighbor_lock_nr)
             self.not_solved_counter = z_up.not_solved_counter
+        else:
+            self.run(sorted_gate_connections, neighbor_lock_nr)
