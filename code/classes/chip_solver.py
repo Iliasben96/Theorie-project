@@ -4,6 +4,8 @@ from code.heuristics.random_priority import get_random_priority
 from code.heuristics.connection_amount import get_amount_of_connections_priority
 from code.heuristics.center_grid import get_priority_center_grid
 from code.heuristics.z_up import Z_Up
+from code.algorithms.random_loop import start_random_solutions
+from code.classes.table_creator import table_creator
 
 import operator
 
@@ -30,13 +32,13 @@ class ChipSolver:
 
         return sorted_connections
 
-    def run(self, sorted_connections, neighbor_option):
+    def run(self, sorted_connections, neighbor_lock_nr):
 
         astar = Astar()
         not_solved_counter = 0
 
         for sorted_connection in sorted_connections.values():
-            path = astar.start(neighbor_option, self.grid, sorted_connection)
+            path = astar.start(neighbor_lock_nr, self.grid, sorted_connection)
             # if A* can not place path +1 to the not_solved_counter
             if path == None:
                 not_solved_counter += 1
@@ -75,6 +77,22 @@ class ChipSolver:
             prioritised_gate_connections = get_priority_center_grid(self.grid, self.gate_connections)
             sorted_gate_connections = self.sort_connections(prioritised_gate_connections)
             self.run(sorted_gate_connections, neighbor_option)
+
+        if option == 6:
+            iterations = input("How many iterations do you want to try: ")
+            while iterations.isdigit() == False:
+                iterations = input("Error: please provide a number higher than zero: ")
+            iterations = int(iterations)
+
+            while iterations < 0:
+                iterations = input("Error: please provide a number higher than zero: ")
+            
+            solved = start_random_solutions(self.grid, iterations, self)
+            if solved == False:
+                print("no solution found")
+            else: 
+                table_creator(self.grid, self.netlist)
+
 
         # uses the 
         if option == 7:

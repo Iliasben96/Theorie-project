@@ -69,6 +69,7 @@ class Astar:
                     path.append(position)
                     grid.all_wires.append(position)
                     position = came_from[position] 
+                path.reverse()
                 grid.put_connection(path, connection)      
                 return path
 
@@ -143,6 +144,7 @@ class Astar:
                     path.append(position)
                     grid.all_wires.append(position)
                     position = came_from[position] 
+                path.reverse()
                 grid.put_connection(path, connection)      
                 return path
 
@@ -186,9 +188,6 @@ class Astar:
         goal_coordinates = goal_gate.coordinates
         # Make sure start and end are walkable
         grid.add_start_end_gates(start_coordinates, goal_coordinates)
-
-        if grid.remove_neighbors == True:
-            grid.add_back_gate_neighbors(start_coordinates, goal_coordinates)
 
         # Initialise the priority queue
         frontier = PriorityQueue()
@@ -248,6 +247,7 @@ class Astar:
                     path.append(position)
                     grid.all_wires.append(position)
                     position = came_from[position] 
+                path.reverse()
                 grid.put_connection(path, connection)      
                 self.state = state_dict[came_from[current]]
                 return path
@@ -312,6 +312,3 @@ class Astar:
 
                         # Store where the child came from
                         came_from[next_node] = current
-
-        if grid.remove_neighbors == True:
-            grid.relock_gate_neighbors(start_coordinates, goal_coordinates)

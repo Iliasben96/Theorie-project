@@ -7,12 +7,12 @@ import random
 
 class Grid: 
 
-    def __init__(self, chip_nr, netlist, remove_neighbors):
+    def __init__(self, chip_nr, netlist, neighbor_lock_nr):
         self.chip_nr = chip_nr
 
         # Option to apply heuristic to remove neighbors from grid when they're not used
         # Accepts True or False statement
-        self.remove_neighbors = remove_neighbors
+        self.neighbor_lock_nr = neighbor_lock_nr
 
         self.netlist = netlist
 
@@ -173,7 +173,7 @@ class Grid:
             self.remove_coordinate(gate_coordinates)
 
         self.get_all_gate_neighbor_list(connected_gates)
-        if self.remove_neighbors == True:
+        if self.neighbor_lock_nr == 2:
             self.remove_gate_neighbors()
 
         return self.mother_grid
