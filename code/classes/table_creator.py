@@ -4,7 +4,7 @@ from code.classes.connection import Connection
 import csv
 
 def table_creator(grid, netlist):
-    with open ('results.csv', 'w', newline='') as file:
+    with open ('data/results/results.csv', 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(["Gate A", "Gate B" , "Wire coordinates"])
 
@@ -21,5 +21,3 @@ def table_creator(grid, netlist):
             else:
                 writer.writerow([net[0], net[1], "No path found"])
             id_counter += 1
-
-        

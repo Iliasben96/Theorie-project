@@ -3,7 +3,7 @@
 # Edit at https://www.gitignore.io/?templates=linux,macos,windows,visualstudiocode
 
 ### Results of programme ###
-results.csv
+results/~
 
 ### Test file ###
 test.py
