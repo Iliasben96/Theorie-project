@@ -4,7 +4,6 @@ from code.heuristics.random_priority import get_random_priority
 from code.heuristics.connection_amount import get_amount_of_connections_priority
 from code.heuristics.center_grid import get_priority_center_grid
 from code.heuristics.z_up import Z_Up
-from code.algorithms.random_loop import start_random_solutions
 from code.classes.results_csv_generator import generate_results_csv
 
 import operator
@@ -40,7 +39,7 @@ class ChipSolver:
         """Run Astar in the order of the sorted_connections, with the correct neighbor_lock_nr"""
 
         astar = Astar()
-        not_solved_counter = 0
+        self.not_solved_counter = 0
 
         # Loop over sorted connections
         for sorted_connection in sorted_connections.values():
@@ -50,10 +49,10 @@ class ChipSolver:
             
             # If Astar can not place path +1 to the not_solved_counter
             if path == None:
-                not_solved_counter += 1
-            self.not_solved_counter = not_solved_counter
+                print("Connectie niet gelegd")
+                self.not_solved_counter += 1
 
-        return not_solved_counter
+        return self.not_solved_counter
 
     def start(self, heuristic_nr, neighbor_lock_nr, z_up_option):
         """Start solving the chip with a heuristic number"""
@@ -83,22 +82,6 @@ class ChipSolver:
         if heuristic_nr == 5:
             prioritised_gate_connections = get_priority_center_grid(self.grid, self.gate_connections)
             sorted_gate_connections = self.sort_connections(prioritised_gate_connections)
-
-        # Try an amount of random netlist orders
-        if heuristic_nr == 6:
-            iterations = input("How many iterations do you want to try: ")
-            while iterations.isdigit() == False:
-                iterations = input("Error: please provide a number higher than zero: ")
-            iterations = int(iterations)
-
-            while iterations < 0:
-                iterations = input("Error: please provide a number higher than zero: ")
-            
-            solved = start_random_solutions(self.grid, iterations, self)
-            if solved == False:
-                print("no solution found")
-            else: 
-                generate_results_csv(self.grid, self.netlist)
 
         # Select the z_up_option based on user input
         if z_up_option == True:

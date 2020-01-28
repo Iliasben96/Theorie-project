@@ -43,14 +43,14 @@ def get_user_heuristic_nr():
     """Fucntion to retrieves the heuristic_nr as a integer, to decide what heuristic to use"""
 
     heuristic_nr = input("What heuristics do you want to run? \n 1: none, 2: " + 
-    "connection_length, 3: random, 4: amount of connections, 5: center grid: 6: random_iterations: ")     
+    "connection_length, 3: random, 4: amount of connections, 5: center grid: ")     
 
     while heuristic_nr.isdigit() == False:
-        heuristic_nr = input("Error: please choose heuristic number (1 through 6): ")
+        heuristic_nr = input("Error: please choose heuristic number (1 through 5): ")
 
     heuristic_nr = int(heuristic_nr)
-    while heuristic_nr < 0 or heuristic_nr > 6:
-        heuristic_nr = input("Error: please choose heuristic number (1 through 6): ")
+    while heuristic_nr < 0 or heuristic_nr > 5:
+        heuristic_nr = input("Error: please choose heuristic number (1 through 5): ")
 
     return heuristic_nr
 
