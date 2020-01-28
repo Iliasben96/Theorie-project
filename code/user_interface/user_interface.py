@@ -7,9 +7,9 @@ from code.algorithms.random_loop import start_random_solutions
 from code.classes.table_creator import table_creator
 
 """
-File that has functions to get relevant user inputs as integers
-It retrieves the chip_nr, netlist_nr to choose what chip to use with what netlist
-It retrieves the heuristics_nr and neighbor_locking_nr to decide which heuristics and neighborlocking options to use
+Functions to get relevant user inputs as integers.
+Retrieves the chip_nr, netlist_nr to choose what chip to use with what netlist
+Retrieves the heuristics_nr and neighbor_locking_nr to decide which heuristics and neighborlocking options to use
 """
 
 def get_user_chip_nr():

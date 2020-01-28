@@ -63,9 +63,12 @@ class Plot:
             ax.scatter(x, y, z, c='r')
             ax.text(x, y, z + 0.2, gate, fontsize=9)    
 
+        # Padding to fix visual representation of grid
+        padding = 1
+
         # Set limits an labels
-        ax.set_xlim(0, grid.grid_max_x - 1)
-        ax.set_ylim(0, grid.grid_max_y - 1)
+        ax.set_xlim(0, grid.grid_max_x - padding)
+        ax.set_ylim(0, grid.grid_max_y - padding)
         ax.set_zlim(0, 6)
         ax.set_xlabel('X axis')
         ax.set_ylabel('Y axis')
@@ -75,7 +78,7 @@ class Plot:
         plt.yticks(np.arange(0, grid.grid_max_y, 1.0))
 
         # Set colors for lines
-        colormap = plt.cm.gist_ncar #nipy_spectral, Set1,Paired   
+        colormap = plt.cm.get_cmap('jet') #nipy_spectral, Set1,Paired   
         colors = [colormap(i) for i in np.linspace(0, 1,len(ax.lines))]
         for i,j in enumerate(ax.lines):
             j.set_color(colors[i])

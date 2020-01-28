@@ -6,18 +6,27 @@ import csv
 import random
 
 class Grid: 
+    """Class that holds a dictionary as grid and that handles all actions involving this grid
+    For example removing and placing coordinates, retrieving neighbors of coordinates, etc.
+    """
 
     def __init__(self, chip_nr, netlist, neighbor_lock_nr):
         self.chip_nr = chip_nr
 
-        # Option to apply heuristic to remove neighbors from grid when they're not used
-        # Accepts True or False statement
+        # Option to apply heuristic to remove neighbors
         self.neighbor_lock_nr = neighbor_lock_nr
 
         self.netlist = netlist
 
-        # Global list that holds all 7 z levels of the x by y grids
+        # Variables that will hold the max x and max y of the grid, they are later initialised according to the chip_nr
+        self.grid_max_x = 0
+        self.grid_max_y = 0
+
+        # Global list that holds all 7 Z levels of the x by y grids
         self.mother_grid = {}
+
+        # Gate_list to hold gates temporarily, before they are moved into the gate_list
+        self.temporary_gate_list = []
 
         # Ordered list of all gates
         self.gate_list = []
@@ -25,10 +34,14 @@ class Grid:
         # Dict of wired_connections
         self.wired_connections = {}
 
+        # Dictionary of all connections as connection objects
         self.gate_connections = {}
 
-        # List with all coordinates used by wires
+        # List containing all coordinates used by wires
         self.all_wires = []
+
+        # Counter to keep track of amount of wires used
+        self.wire_count = 0
 
         # Dictionary that has the coordinates of a neighbor of a gate as key, and the gate numbers that have this neighbor as values
         self.neighbors_gates_link = {}
@@ -36,33 +49,23 @@ class Grid:
         # List with tuples containing the coordinates of all neighbors of all gates
         self.all_gate_neighbors = []
 
-        self.grid_max_x = 0
-        self.grid_max_y = 0
-
-        self.temporary_gate_list = []
-
         # Get a dictionary with the amount of connections for each gate, according to the provided netlist
         self.connections_per_gate = get_connections_per_gate(self.netlist)
 
         # Get the amount of gates from the chip_csv file
         self.gate_count = self.read_chip_csv(chip_nr)
 
-        # Init the initial startgrid
+        # Init the start grid
         self.get_start_grid(chip_nr)
 
         # Generate a list with connection objects
-        self.make_connections()
-
-        # Counter to keep track of amount of wires used
-        self.wire_count = 0
+        self.make_connections_dict()
 
 
     def read_chip_csv(self, chip_nr):
-        """ 
-        Function to calculate how many gates a print list has.
-        """
-        counter = 0
+        """ Function to calculate how many gates a print list has"""
 
+        counter = 0
         first_row = True
 
         # Create path to open chip
@@ -74,7 +77,6 @@ class Grid:
 
             # Loop over csv rows
             for row in filereader:
-
                 if first_row:
                     first_row = False
                     continue
@@ -83,16 +85,11 @@ class Grid:
                 # Remove comma
                 for i in range(0, 2):
                     row[i] = row[i].strip(',')
-
                 self.temporary_gate_list.append(row)
-
         return counter          
 
     def get_start_grid(self, chip_nr):
-
-        """
-        Create the start grid according to a chip_nr with a set amount of gates
-        """
+        """Create the start grid according to a chip_nr with a set amount of gates"""
 
         # Lists to later figure out the maximum coordinates of a gate
         all_x = []
@@ -113,6 +110,7 @@ class Grid:
                 gate_connection_amount = self.connections_per_gate[gate_nr]
 
 
+            # Make tuple to store the coordinates of the gate, (x, y, z)
             gate_coordinates = (gate_x, gate_y, 0)
 
             # Add the coordinates of the gate to a list
@@ -122,6 +120,7 @@ class Grid:
             # Create new gate object and add it to the list of gates
             new_gate = Gate(gate_nr, gate_coordinates, gate_connection_amount)
 
+            # TODO: make this a dict
             # Gatelist that stores all gates
             self.gate_list[gate_nr - 1] = new_gate
 
@@ -133,13 +132,14 @@ class Grid:
         padding_x = 2
         padding_y = 2
 
+        # Give grid a max_x and max_y, taken into account the padding
         grid_max_x = max_x + padding_x
         grid_max_y = max_y + padding_y
 
         self.grid_max_x = grid_max_x
         self.grid_max_y = grid_max_y
 
-        # Create empty layers on top of base layer
+        # Create Z amount of empty layers 
         for z in range(0, 7):
             grid = {}
 
@@ -151,12 +151,10 @@ class Grid:
 
                 # Add each row to the grid
                 grid[y] = row
-
             self.mother_grid[z] = grid
 
+        # Init list to make sure that later, neighbors of unconnected gates are not locked
         connected_gates = []
-
-
 
         # Loop over all connections in gate list
         for gate in self.gate_list:
@@ -169,10 +167,11 @@ class Grid:
 
             # Remove coordinates of gates from grid, so that Astar can't use it to make a path later
             gate_coordinates = gate.coordinates
-
             self.remove_coordinate(gate_coordinates)
+        self.get_all_gate_neighbor_dict(connected_gates)
 
-        self.get_all_gate_neighbor_list(connected_gates)
+        """If neighbor lock option is 2, meaning gates should be locked at the init, 
+        remove the coordinates of the neighbors from the grid"""
         if self.neighbor_lock_nr == 2:
             self.remove_gate_neighbors()
 
@@ -183,47 +182,58 @@ class Grid:
         Places a coordinate in the grid
         """
 
+        # Get the correct row from the mother_grid
         row_to_place = self.mother_grid[coordinates[2]][coordinates[1]]
         
+        # Only place if the coordinate does not yet exist
         if coordinates[0] not in row_to_place:
             row_to_place.append(coordinates[0])
             return True
-
         return False
 
     def remove_coordinate(self, coordinates):
         """
         Removes a coordinate from the grid
         """
+
+        # Get correct row from the mother grid
         row_to_remove = self.mother_grid[coordinates[2]][coordinates[1]]
 
+        # Only remove the coordinate if it exists
         if coordinates[0] in row_to_remove:
             row_to_remove.remove(coordinates[0])
             return True
         return False
 
 
-    def get_all_gate_neighbor_list(self, connected_gates):
+    def get_all_gate_neighbor_dict(self, connected_gates):
+        """Returns all neighbors of all connected gates
+        """
 
         # For each gate that has a connection according to the netlist
         for gate_nr in connected_gates:
 
+            # Get gate_from gatelist
             gate = self.gate_list[gate_nr - 1]
+
             # Get neighbors of this gate
             neighbors = self.get_gate_neighbors(gate.coordinates)
+
+            # Loop over the all neighbors
             for neighbor in neighbors:
 
                 if neighbor not in self.neighbors_gates_link:
+
+                    # Store gate number in dict, with coordinate of the gate as key
                     self.neighbors_gates_link[neighbor] = [gate_nr]
                 else:
+
+                    # If the neighbor is already in dict with gate_nr, add current gate_nr to list
                     self.neighbors_gates_link[neighbor].append(gate_nr)
 
+                # Add neighbor to all_gate_neighbors, without duplicates
                 if neighbor not in self.all_gate_neighbors:
-
                     self.all_gate_neighbors.append(neighbor)
-                    gate.neighbors.append(neighbor)
-
-
 
     def remove_gate_neighbors(self):
 
@@ -234,7 +244,7 @@ class Grid:
 
             self.remove_coordinate(gate_neighbor)
 
-    def make_connections(self):
+    def make_connections_dict(self):
         """
         Makes all connections in netlist into connection objects and stores them in a dictionary
         """
@@ -251,6 +261,8 @@ class Grid:
             goal_gate = self.gate_list[gate_b_nr - 1]
 
             new_connection = Connection(start_gate, goal_gate, id_counter)
+
+            # Add new Connection, with id as key and Connection object as value
             self.gate_connections[id_counter] = new_connection
             id_counter += 1
 
@@ -260,15 +272,18 @@ class Grid:
         Function takes a connection or path (usually from Astar) and removes the coordinates of each step from grid
         """
 
+        # Loop over each coordinate in the path
+        for coordinate in path:
 
-        for position in path:
-
-            self.remove_coordinate(position)
+            self.remove_coordinate(coordinate)
 
             # Count total length of all wires
             self.wire_count += 1
 
+        # Make new connection dict with connection and path 
         connection_dict = {"path" : path, "connection" : connection}
+
+        # Add connection_dict to dict with connections, indexed on it's ID
         self.wired_connections[connection.connection_id] = connection_dict
 
 
@@ -277,6 +292,7 @@ class Grid:
         Function that returns all neighbor coordinates of a position
         """
 
+        # Get coordinates from inputted tuple position
         x = position[0]
         y = position[1]
         z = position[2]
@@ -318,7 +334,7 @@ class Grid:
 
     def get_gate_neighbors(self, position):
         """
-        Get neighbor coordinates of all gates
+        Get neighbor coordinates of a gate
         """
         x = position[0]
         y = position[1]
