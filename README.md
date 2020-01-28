@@ -1,15 +1,15 @@
 # Chips & Circuits
-<p>In the Chips & Circuits problem, a number of gates need to be connected with eachother, with the lowest amount of wires possible. The wires that connect the gates, cannot use the positions of the gates and the wires cannot cross paths. Wires can also go up in the 3rd dimension to allow for more space to connect the wires.</p>
+<p>In the Chips & Circuits case a number of gates need to be connected with each other, while using the lowest amount of wires possible. The wires that connect the gates cannot use the positions of the other gates and the wires cannot cross paths. The wires can only go through the grid Manhatten style. Wires can also go up in the 3rd dimension to allow for more space to connect the wires.</p>
 
-<p>The case provides at least 2 csv files, one file with x and y coordinates for gates that need to be place, and one netlist that provides the connections that need to be made between these </p>
+<p>The case provides at least 2 csv files, one file with x and y coordinates for gates that need to be placed, and one netlist that provides the connections that need to be made between these gates.</p>
 
 ## This programme
 
-<p>This programme attempts to solve the Chips & Circuits problem in a multitude of ways. It uses an implementation of Astar to find the shortest paths for each connection in the netlist. This however, is not enough to solve the problem. Heuristics need to be applied to find a valid solution to the problem.</p>
+<p>This programme attempts to solve the Chips & Circuits problem in a multitude of ways. It uses an implementation of the Astar algorithm to find the shortest paths for each connection in the netlist. This however, is not enough to solve the problem. Heuristics need to be applied to find a valid solution to the problem.</p>
 
 ## Getting setup
 ### Requirements
-<p> This code was completly writen in Python 3.8. In requirement.txt are all packages required to run this code. Use pip to install the packages:</p>
+<p> This code was completly writen in Python 3.7. In requirement.txt are all packages required to run this code. Use pip to install the packages:</p>
 <pre>
     <code>pip install -r requirements.txt</code>
 </pre>
@@ -29,7 +29,7 @@
     </li>
     <ul>
         <li><strong>/code/algorithms</strong>
-            : contains all algortihms
+            : contains all algorithms
         </li>
         <li><strong>/code/classes</strong>
             : contains all classes and helper functions
