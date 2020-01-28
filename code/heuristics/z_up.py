@@ -26,10 +26,7 @@ class Z_Up:
         return True
 
     def increase_level(self, grid):
-
-        """
-        Function that increases level of all current connections
-        """
+        """Function that increases level of all current connections"""
 
         # Place back connections that were removed as walkable due to Astar
         for connection in grid.wired_connections.values():
@@ -37,10 +34,8 @@ class Z_Up:
             for coordinate in path:
                 grid.place_coordinate(coordinate)
 
-        """
-        Select correct wires, only wires that have a length more than 4 get their z incremented, 
-        as otherwise it does not free up space in a grid where only manhattan moves are allowed.
-        """
+        # Select correct wires, only wires that have a length more than 4 get their z incremented, 
+        # as otherwise it does not free up space in a grid where only manhattan moves are allowed.
         for connection in grid.wired_connections.values():
 
             path = connection["path"]

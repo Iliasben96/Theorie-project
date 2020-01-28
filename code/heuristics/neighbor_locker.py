@@ -71,7 +71,7 @@ class NeighborLocker:
         return available_neighbors
 
     def lock_double_neighbors(self, locked_neighbors, all_gate_neighbors, available_neighbors):
-        """Function that looks if new locked situation should make sure other gates lock asswell"""
+        """Function that looks if new locked situation should make sure other gates lock aswell"""
 
         for locked_neighbor in locked_neighbors:
             neighbors_to_check = all_gate_neighbors[locked_neighbor]

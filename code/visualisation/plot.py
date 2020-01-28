@@ -4,8 +4,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 class Plot:
-    """Visualisation of the connections between the gates, according to the gate list, on the grid
-    """
+    """Visualisation of the connections between the gates, according to the gate list, on the grid"""
 
     def __init__(self, grid):
         self.grid = grid

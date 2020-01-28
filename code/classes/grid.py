@@ -63,7 +63,7 @@ class Grid:
 
 
     def read_chip_csv(self, chip_nr):
-        """ Function to calculate how many gates a print list has"""
+        """Function to calculate how many gates a print list has"""
 
         counter = 0
         first_row = True
@@ -71,7 +71,7 @@ class Grid:
         # Create path to open chip
         path = 'data/gates&netlists/chip_' + str(chip_nr) + '/print_' + str(chip_nr) + '.csv'
 
-        # open CSV file
+        # Open CSV file
         with open(path, newline='') as gatesfile:
             filereader = csv.reader(gatesfile, delimiter=' ', quotechar = '|')
 
@@ -120,7 +120,6 @@ class Grid:
             # Create new gate object and add it to the list of gates
             new_gate = Gate(gate_nr, gate_coordinates, gate_connection_amount)
 
-            # TODO: make this a dict
             # Gatelist that stores all gates
             self.gate_list[gate_nr - 1] = new_gate
 
@@ -158,6 +157,7 @@ class Grid:
 
         # Loop over all connections in gate list
         for gate in self.gate_list:
+
             # Check if the gate is in the netlist
             for connection in self.netlist:
                 if gate.nr in connection and gate.nr not in connected_gates:
@@ -170,17 +170,15 @@ class Grid:
             self.remove_coordinate(gate_coordinates)
         self.get_all_gate_neighbor_dict(connected_gates)
 
-        """If neighbor lock option is 2, meaning gates should be locked at the init, 
-        remove the coordinates of the neighbors from the grid"""
+        # If neighbor lock option is 2, meaning gates should be locked at the init, 
+        # remove the coordinates of the neighbors from the grid
         if self.neighbor_lock_nr == 2:
             self.remove_gate_neighbors()
 
         return self.mother_grid
 
     def place_coordinate(self, coordinates):
-        """
-        Places a coordinate in the grid
-        """
+        """Places a coordinate in the grid"""
 
         # Get the correct row from the mother_grid
         row_to_place = self.mother_grid[coordinates[2]][coordinates[1]]
@@ -192,9 +190,7 @@ class Grid:
         return False
 
     def remove_coordinate(self, coordinates):
-        """
-        Removes a coordinate from the grid
-        """
+        """Removes a coordinate from the grid"""
 
         # Get correct row from the mother grid
         row_to_remove = self.mother_grid[coordinates[2]][coordinates[1]]
@@ -236,18 +232,13 @@ class Grid:
                     self.all_gate_neighbors.append(neighbor)
 
     def remove_gate_neighbors(self):
+        """Removes neighbors of every gate from the grid"""
 
-        """
-        Removes neighbors of every gate from the grid
-        """
         for gate_neighbor in self.all_gate_neighbors:
-
             self.remove_coordinate(gate_neighbor)
 
     def make_connections_dict(self):
-        """
-        Makes all connections in netlist into connection objects and stores them in a dictionary
-        """
+        """Makes all connections in netlist into connection objects and stores them in a dictionary"""
 
         id_counter = 0
         for connection in self.netlist:
@@ -268,9 +259,7 @@ class Grid:
 
 
     def put_connection(self, path, connection):
-        """
-        Function takes a connection or path (usually from Astar) and removes the coordinates of each step from grid
-        """
+        """Function takes a connection or path (usually from Astar) and removes the coordinates of each step from grid"""
 
         # Loop over each coordinate in the path
         for coordinate in path:
@@ -288,9 +277,7 @@ class Grid:
 
 
     def get_neighbors(self, position):
-        """ 
-        Function that returns all neighbor coordinates of a position
-        """
+        """Function that returns all neighbor coordinates of a position"""
 
         # Get coordinates from inputted tuple position
         x = position[0]
@@ -333,9 +320,7 @@ class Grid:
 
 
     def get_gate_neighbors(self, position):
-        """
-        Get neighbor coordinates of a gate
-        """
+        """Get neighbor coordinates of a gate"""
         x = position[0]
         y = position[1]
         z = position[2]
@@ -373,17 +358,13 @@ class Grid:
         return(neighbors)
 
     def add_start_end_gates(self, start, goal):
-        """
-        Add start and end gates as walkable terrain when they are being used
-        """
+        """Add start and end gates as walkable terrain when they are being used"""
         self.place_coordinate(start)
         self.place_coordinate(goal)
 
 
     def add_back_gate_neighbors(self, start, goal):
-        """
-        Add back neighbors as walkable terrain
-        """
+        """Add back neighbors as walkable terrain"""
         start_neighbors = self.get_gate_neighbors(start)
 
         found_wire = False
@@ -417,9 +398,7 @@ class Grid:
                 self.place_coordinate(goal_neighbor)
 
     def relock_gate_neighbors(self, start, goal):
-        """
-        Relock the neighbors of the gate 
-        """
+        """Relock the neighbors of the gate"""
 
         # Lock neighbors to not be walkable anymore
         start_neighbors = self.get_gate_neighbors(start)

@@ -1,9 +1,5 @@
-"""Functions to get relevant user inputs as integers.
-Retrieves the chip_nr, netlist_nr to choose what chip to use with what netlist
-Retrieves the heuristics_nr and neighbor_locking_nr to decide which heuristics and neighborlocking options to use
-"""
-
 def get_user_chip_nr():
+    """Fucntion to retrieves the chip_nr as a integer"""
 
     chip_nr = input("Please choose the chip number: (1 or 2) ")
 
@@ -17,6 +13,7 @@ def get_user_chip_nr():
     return int(chip_nr)
 
 def get_user_netlist_nr(chip_nr):
+    """Fucntion to retrieves the netlist_nr as a integer for the correct chip"""
 
     netlist_nr = 0
     if chip_nr == 1:
@@ -43,6 +40,7 @@ def get_user_netlist_nr(chip_nr):
     return netlist_nr
 
 def get_user_heuristic_nr():
+    """Fucntion to retrieves the heuristic_nr as a integer, to decide what heuristic to use"""
 
     heuristic_nr = input("What heuristics do you want to run? \n 1: none, 2: " + 
     "connection_length, 3: random, 4: amount of connections, 5: center grid: 6: random_iterations: ")     
@@ -57,6 +55,7 @@ def get_user_heuristic_nr():
     return heuristic_nr
 
 def get_user_neighbor_lock_nr():
+    """Fucntion to retrieves the chip_neighbor_locker_nr as a integer, to decide what locking option to use"""
 
     neighbor_lock_input = input("What kind of neighbor locking would you like to enable? \n " + 
     "1: No locking 2: Lock everything before running 3: Lock during runtime (1, 2 or 3): ")
@@ -71,6 +70,10 @@ def get_user_neighbor_lock_nr():
     return neighbor_lock_input
 
 def get_z_up():
+    """Fucntion to retrieves the user choice if they want to use 
+    Z-up Heuristic in combination with the already chosen heurstic
+    """
+
     z_up_input = input("Would you like to increment Z of all connections every time a connections can't be laid? (yes/no) ")
 
     while z_up_input != "yes" and z_up_input != "no":

@@ -11,7 +11,7 @@ import operator
 
 class ChipSolver:  
     """ Chipsolver creates a priority list for all connections from the netlist, 
-    it calls A* to find the shortest path for each connection.
+    it calls Astar to find the shortest path for each connection.
     User input is required to select a what heuristic to apply and what option to pick for neighborlocking
     """
     
@@ -29,6 +29,7 @@ class ChipSolver:
 
         # filters connections based on priority 
         for connection in (sorted(gate_connections.values(), key=operator.attrgetter('priority'))):
+
             # assigns heighest priority first in the list
             sorted_connections[priority] = connection
             priority += 1
@@ -47,7 +48,7 @@ class ChipSolver:
             # Get a path from Astar algorithm
             path = astar.start(neighbor_lock_nr, self.grid, sorted_connection)
             
-            # if A* can not place path +1 to the not_solved_counter
+            # If Astar can not place path +1 to the not_solved_counter
             if path == None:
                 not_solved_counter += 1
             self.not_solved_counter = not_solved_counter
@@ -63,7 +64,6 @@ class ChipSolver:
         if heuristic_nr == 1:
             sorted_gate_connections = self.sort_connections(self.gate_connections)
 
-
         # Connections with shorter length have priority
         if heuristic_nr == 2:
             prioritised_gate_connections = get_connection_length_priority(self.gate_connections)
@@ -73,7 +73,6 @@ class ChipSolver:
         if heuristic_nr == 3:
             prioritised_gate_connections = get_random_priority(self.gate_connections)
             sorted_gate_connections = self.sort_connections(prioritised_gate_connections)
-
 
         # Netlist is ordered by the amount of connections, gates with most connections have priority
         if heuristic_nr == 4:

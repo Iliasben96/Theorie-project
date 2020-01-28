@@ -1,4 +1,3 @@
-
 def get_amount_of_connections_priority(netlist, gate_connections):
     """Gives gates with more connections more priority"""
 
@@ -6,7 +5,6 @@ def get_amount_of_connections_priority(netlist, gate_connections):
     connections_per_gate = get_connections_per_gate(netlist)
     for gate_nr,n_connections in connections_per_gate.items():
 
-    
         # Creates a priority based on connections, 6 is used so priority is never 0
         priority = (6 - n_connections) / 2
 

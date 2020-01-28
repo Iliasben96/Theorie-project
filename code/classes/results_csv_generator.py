@@ -4,8 +4,7 @@ from code.classes.connection import Connection
 import csv
 
 def generate_results_csv(grid, netlist):
-    """Writes the result of a solving attempt to a csv file 
-    """
+    """Writes the result of a solving attempt to a csv file"""
     
     with open ('data/results/results.csv', 'w', newline='') as file:
         writer = csv.writer(file)
