@@ -2,7 +2,7 @@ import csv
 
 # Function to load netlist
 def netlistreader(chip_number, netlist_number):
-
+    
     netlist = []
     first_row = True
 
