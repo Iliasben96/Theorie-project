@@ -76,7 +76,7 @@ if __name__ == "__main__":
         while iterations < 0:
             iterations = input("Error: please provide a number higher than zero: ")
         
-        solved = start_random_solutions(chip_nr, netlist, neighbor_lock, iterations)
+        solved = start_random_solutions(chip_nr, netlist, neighbor_lock, iterations, neighbor_lock_input)
         if solved == False:
             print("no solution found")
 
