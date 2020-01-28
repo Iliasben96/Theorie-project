@@ -36,9 +36,10 @@ class Plot:
         
 
         # Creation of lists with coordinates for the wires
-        connections = grid.connections_list
+        connections = grid.wired_connections
 
-        for connection in connections:
+        for connection_dict in connections.values():
+            connection_path = connection_dict["path"]
 
             # Creation of list of wire coordinates
             wire_x = []
@@ -46,13 +47,13 @@ class Plot:
             wire_z = []
 
             # Adds wire to the wire coordinates list
-            for wire in connection:
+            for wire in connection_path:
                 wire_x.append(wire[0])
                 wire_y.append(wire[1])
                 wire_z.append(wire[2])
             
-            # Add wires
-            ax.plot(xs=wire_x, ys=wire_y, zs=wire_z, c='r')
+                # Add wires
+                ax.plot(xs=wire_x, ys=wire_y, zs=wire_z, c='r')
 
         # Add gates
         for i,gate in enumerate(gate_numbers):

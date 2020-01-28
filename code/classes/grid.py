@@ -22,8 +22,8 @@ class Grid:
         # Ordered list of all gates
         self.gate_list = []
 
-        # List of connections made by the algorithm
-        self.connections_list = []
+        # Dict of wired_connections
+        self.wired_connections = {}
 
         self.gate_connections = {}
 
@@ -255,18 +255,21 @@ class Grid:
             id_counter += 1
 
 
-    def put_connection(self, connection):
+    def put_connection(self, path, connection):
         """
         Function takes a connection or path (usually from Astar) and removes the coordinates of each step from grid
         """
-        for wire in connection:
 
-            self.remove_coordinate(wire)
+
+        for position in path:
+
+            self.remove_coordinate(position)
 
             # Count total length of all wires
             self.wire_count += 1
 
-        self.connections_list.append(connection)
+        connection_dict = {"path" : path, "connection" : connection}
+        self.wired_connections[connection.connection_id] = connection_dict
 
 
     def get_neighbors(self, position):
@@ -412,58 +415,3 @@ class Grid:
 
         for goal_neighbor in goal_neighbors:
             self.remove_coordinate(goal_neighbor)
-
-    def increase_level(self):
-
-        """
-        Function that increases level of all current connections
-        """
-
-
-        # Place back connections that were removed as walkable due to Astar
-        for connection in self.connections_list:
-            for coordinate in connection:
-                self.place_coordinate(coordinate)
-
-        """
-        Select correct wires, only wires that have a length more than 4 get their z incremented, 
-        as otherwise it does not free up space in a grid where only manhattan moves are allowed.
-        """
-        for connection in self.connections_list:
-            if len(connection) > 4:
-                second_wire = connection[1]
-                second_last_wire = connection[-2]
-
-                # Create new wire with added Z coördinate
-                insert_third_wire_list = list(second_wire)
-                insert_third_wire_list[2] += 1
-                insert_third_wire = tuple(insert_third_wire_list)
-
-                # Create new wire with added Z coördinate
-                insert_third_last_wire_list = list(second_last_wire)
-                insert_third_last_wire_list[2] += 1
-                insert_third_last_wire = tuple(insert_third_last_wire_list)
-
-                # Insert third and third to last wire
-                connection.insert(2, insert_third_wire)
-                connection.insert(-2, insert_third_last_wire)
-
-        # Increase Z coördinate of every cable between third and third to last wire
-        for connection in self.connections_list:
-            if len(connection) > 4:
-                counter = 0
-                max_wires = len(connection)
-                for wire in connection:
-                    if (max_wires - 3) > counter and counter > 2:
-                        list_wire = list(wire)
-                        list_wire[2] += 1
-                        insert_wire = tuple(list_wire)
-                    else:
-                        insert_wire = wire
-                    connection[counter] = insert_wire
-                    counter += 1
-
-        # Remove all coordinates from new connections from the grid, so Astar can't walk there anymore
-        for connection in self.connections_list:
-            for coordinate in connection:
-                self.remove_coordinate(coordinate)

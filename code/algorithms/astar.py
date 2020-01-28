@@ -69,7 +69,7 @@ class Astar:
                     path.append(position)
                     grid.all_wires.append(position)
                     position = came_from[position] 
-                grid.put_connection(path)      
+                grid.put_connection(path, connection)      
                 return path
 
             # Get neighbors from grid
@@ -143,7 +143,7 @@ class Astar:
                     path.append(position)
                     grid.all_wires.append(position)
                     position = came_from[position] 
-                grid.put_connection(path)      
+                grid.put_connection(path, connection)      
                 return path
 
             # Get neighbors from grid
@@ -248,7 +248,7 @@ class Astar:
                     path.append(position)
                     grid.all_wires.append(position)
                     position = came_from[position] 
-                grid.put_connection(path)      
+                grid.put_connection(path, connection)      
                 self.state = state_dict[came_from[current]]
                 return path
 

@@ -12,6 +12,90 @@ class Z_Up:
         self.grid = grid
         self.not_solved_counter = not_solved_counter
 
+    def can_raise(self, grid):
+        # Place back connections that were removed as walkable due to Astar
+        for connection in grid.wired_connections.values():
+
+            path = connection["path"]
+
+            # print(path)
+            for coordinate in path:
+                
+                if coordinate[2] == 6:
+                    return False
+        return True
+
+    def increase_level(self, grid):
+
+        """
+        Function that increases level of all current connections
+        """
+
+        # Place back connections that were removed as walkable due to Astar
+        for connection in grid.wired_connections.values():
+            path = connection["path"]
+            for coordinate in path:
+                grid.place_coordinate(coordinate)
+
+        """
+        Select correct wires, only wires that have a length more than 4 get their z incremented, 
+        as otherwise it does not free up space in a grid where only manhattan moves are allowed.
+        """
+        for connection in grid.wired_connections.values():
+
+            path = connection["path"]
+
+            if len(path) > 4:
+                second_wire = path[1]
+                second_last_wire = path[-2]
+
+                # Create new wire with added Z coördinate
+                insert_third_wire_list = list(second_wire)
+                insert_third_wire_list[2] += 1
+                insert_third_wire = tuple(insert_third_wire_list)
+
+                # Create new wire with added Z coördinate
+                insert_third_last_wire_list = list(second_last_wire)
+                insert_third_last_wire_list[2] += 1
+                insert_third_last_wire = tuple(insert_third_last_wire_list)
+
+                # Insert third and third to last wire
+                path.insert(2, insert_third_wire)
+                path.insert(-2, insert_third_last_wire)
+
+                # Make sure added wires are represented in the wire_count
+                grid.wire_count += 2
+
+
+        # Increase Z coördinate of every cable between third and third to last wire
+        for connection in grid.wired_connections.values():
+
+            path = connection["path"]
+
+            if len(path) > 4:
+                counter = 0
+                max_wires = len(path)
+                for wire in path:
+                    if (max_wires - 3) > counter and counter > 2:
+                        list_wire = list(wire)
+                        list_wire[2] += 1
+                        insert_wire = tuple(list_wire)
+                    else:
+                        insert_wire = wire
+                    path[counter] = insert_wire
+                    counter += 1
+
+        # Remove all coordinates from new connections from the grid, so Astar can't walk there anymore
+        for connection in grid.wired_connections.values():
+
+            path = connection["path"]
+            for wire in path:
+                grid.remove_coordinate(wire)
+
+        return False
+
+
+
     def solver(self, neighbor_option, sorted_connections):
         astar = Astar()
         unsolved_dict = {}
@@ -29,24 +113,29 @@ class Z_Up:
 
         return unsolved_dict
 
-    def run(self, neighbor_option):
+    def run(self, grid, neighbor_option):
 
-        counter = 0
         to_solve = self.sorted_connections
         not_solved = self.solver(neighbor_option, to_solve)
+        self.not_solved_counter = len(not_solved)
+
+        # Init previous not solved to have one more to come into the loop
+        previous_not_solved = self.not_solved_counter + 1
+
         # keeps running until there are no unresolved connections
-        while not_solved != False:
 
-            # raise level function can only be used once
-            if counter > 2:
-                print("Oeps, out of bounds")
-                break
+        while self.not_solved_counter != 0 and self.can_raise(grid) and previous_not_solved > self.not_solved_counter:
 
-            # runs the increase level funtion
-            self.grid.increase_level()
+            self.increase_level(grid)
+
+            previous_not_solved = self.not_solved_counter
 
             # tries to solve the unsolved connections after raising the level
             not_solved = self.solver(neighbor_option, not_solved)
-            counter += 1
         
-        self.not_solved_counter = len(not_solved)
+            self.not_solved_counter = len(not_solved)
+    
+    # def re_solve(self, grid, neighbor_option):
+    #     astar = Astar()
+
+
